@@ -1,0 +1,243 @@
+swagger: "2.0"
+info:
+  description: "Esquema en el que estarán construidos los servicios para la aplicación de agendador de citas"
+  version: "0.0.1"
+  title: "Agenda"
+host: localhost
+basePath: /v2
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /agendas:
+    post:
+      summary: "Crea instancias de agenda para un usuario o grupo"
+      operationId: "crearAgenda"
+      parameters:
+        - name: app_id
+          in: header
+          description: ID de la app
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: ID del usuario que inicio sesión
+          required: true
+          type: integer
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Agenda"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+    put:
+      summary: "Actualiza una instancia de agenda"
+      operationId: "ActualizaAgenda"
+      parameters:
+        - name: app_id
+          in: header
+          description: ID de la app
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: ID del usuario que inicio sesión
+          required: true
+          type: integer
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Agenda"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /agendas/{agenda_id}:
+    put:
+      summary: "Cambia el status de una agenda de activa a inactiva"
+      operationId: "ActualizaStatusAgenda"
+      parameters:
+        - name: app_id
+          in: header
+          description: ID de la app
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: ID del usuario que inicio sesión
+          required: true
+          type: integer
+        - name: agenda_id
+          in: path
+          required: true
+          type: integer
+          description: ID de la agenda"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /agendas/listar/{pagina}:
+    get:
+      summary: Lista todas las instancias de agenda
+      operationId: listarAgendas
+      parameters:
+        - name: app_id
+          in: header
+          description: ID de la app
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: ID del usuario que inicio sesión
+          required: true
+          type: integer
+        - name: pagina
+          in: path
+          required: true
+          type: integer
+          description: Número de página a obtener (Paginación)
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Agenda"
+        "404":
+          description: "Recurso no encontrado"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /agendas/filtrar/{texto}/{pagina}:
+    get:
+      parameters:
+        - name: app_id
+          in: header
+          description: ID de la app
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: ID del usuario que inicio sesión
+          required: true
+          type: integer
+        - name: texto
+          in: path
+          required: true
+          type: string
+          description: Texto coincidente a buscar en el campo "pertenece a" o "nombre agenda"
+        - name: pagina
+          in: path
+          required: true
+          type: integer
+          description: Número de página a obtener (Paginación)
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Agenda"
+        "404":
+          description: "Recurso no encontrado"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+definitions:
+  GenericResponse:
+    type: object
+    required:
+      - codigo
+      - mensaje
+    properties:
+      codigo:
+        type: integer
+        format: int32
+        description: "Código de status interno para operaciones request"
+      mensaje:
+        type: string
+        description: "Mensaje de status interno para operaciones request"
+  Agenda:
+    type: object
+    required:
+      - nombre
+      - pertenece_id
+      - es_grupo
+      - horario
+      - tiempo_atencion
+      - concurrencia
+      - status
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: "Identificador único autoincrementable de la agenda"
+      nombre:
+        type: string
+        description: "Nombre de la agenda"
+      pertenece_id:
+        type: integer
+        format: int32
+        description: "ID del usuario o grupo al que se le va a asignar la agenda"
+      es_grupo:
+        type: integer
+        format: int32
+        description: "Si es grupo se coloca en 1 sino entonces es un usuario y se coloca 0"
+      horario:
+        type: string
+        description: "Horario del trámite (Data serializada)"
+      tiempo_atencion:
+        type: integer
+        format: int32
+        description: "Duración que puede tener una cita dentro de la agenda (Definido en minutos)"
+      concurrencia:
+        type: integer
+        format: int32
+        description: "Cantidad de citas que se pueden agendar en la misma hora"
+      status:
+        type: integer
+        format: int32
+        description: "Status de la agenda"
