@@ -20,12 +20,12 @@ paths:
       parameters:
         - name: app_id
           in: header
-          description: ID de la app
+          description: "ID de la app"
           required: true
           type: integer
         - name: usuario_id
           in: header
-          description: ID del usuario que inicio sesión
+          description: "ID del usuario que inicio sesión"
           required: true
           type: integer
         - name: data
@@ -50,12 +50,12 @@ paths:
       parameters:
         - name: app_id
           in: header
-          description: ID de la app
+          description: "ID de la app"
           required: true
           type: integer
         - name: usuario_id
           in: header
-          description: ID del usuario que inicio sesión
+          description: "ID del usuario que inicio sesión"
           required: true
           type: integer
         - name: data
@@ -81,19 +81,19 @@ paths:
       parameters:
         - name: app_id
           in: header
-          description: ID de la app
+          description: "ID de la app"
           required: true
           type: integer
         - name: usuario_id
           in: header
-          description: ID del usuario que inicio sesión
+          description: "ID del usuario que inicio sesión"
           required: true
           type: integer
         - name: agenda_id
           in: path
           required: true
           type: integer
-          description: ID de la agenda"
+          description: "ID de la agenda"
       responses:
         "200":
           description: "Success"
@@ -107,24 +107,24 @@ paths:
             $ref: "#/definitions/GenericResponse"
   /agendas/listar/{pagina}:
     get:
-      summary: Lista todas las instancias de agenda
+      summary: "Lista todas las instancias de agenda"
       operationId: listarAgendas
       parameters:
         - name: app_id
           in: header
-          description: ID de la app
+          description: "ID de la app"
           required: true
           type: integer
         - name: usuario_id
           in: header
-          description: ID del usuario que inicio sesión
+          description: "ID del usuario que inicio sesión"
           required: true
           type: integer
         - name: pagina
           in: path
           required: true
           type: integer
-          description: Número de página a obtener (Paginación)
+          description: "Número de página a obtener (Paginación)"
       responses:
         "200":
           description: "Success"
@@ -144,29 +144,24 @@ paths:
           description: "Error por default"
           schema:
             $ref: "#/definitions/GenericResponse"
-  /agendas/filtrar/{texto}/{pagina}:
+  /agendas/filtrar/{texto}:
     get:
       parameters:
         - name: app_id
           in: header
-          description: ID de la app
+          description: "ID de la app"
           required: true
           type: integer
         - name: usuario_id
           in: header
-          description: ID del usuario que inicio sesión
+          description: "ID del usuario que inicio sesión"
           required: true
           type: integer
         - name: texto
           in: path
           required: true
           type: string
-          description: Texto coincidente a buscar en el campo "pertenece a" o "nombre agenda"
-        - name: pagina
-          in: path
-          required: true
-          type: integer
-          description: Número de página a obtener (Paginación)
+          description: "Texto coincidente a buscar en el campo pertenece a o nombre agenda"
       responses:
         "200":
           description: "Success"
@@ -178,6 +173,125 @@ paths:
           description: "Recurso no encontrado"
           schema:
             $ref: "#/definitions/GenericResponse"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /dias-no-laborables:
+    post:
+      summary: "Crea días no laborables"
+      operationId: "crearDiasNoLaborables"
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/DiasNoLaborables"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+    put:
+      summary: "Actualiza los días no laborables"
+      operationId: "ActualizaDiaNoLaboral"
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/DiasNoLaborables"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+    get:
+      summary: "Lista todos los días no laborables futuros"
+      operationId: listarDiasNoLaborables
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/DiasNoLaborables"
+        "404":
+          description: "Recurso no encontrado"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+    delete:
+      summary: "Elimina un día no laboral"
+      operationId: eliminaDiasNoLaborables
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: "Success"
         "500":
           description: "Error de servidor"
           schema:
@@ -204,6 +318,7 @@ definitions:
     type: object
     required:
       - nombre
+      - nombre_pertenece
       - pertenece_id
       - es_grupo
       - horario
@@ -218,6 +333,9 @@ definitions:
       nombre:
         type: string
         description: "Nombre de la agenda"
+      nombre_pertenece:
+        type: string
+        description: "Nombre a quién pertenece la agenda"
       pertenece_id:
         type: integer
         format: int32
@@ -241,3 +359,20 @@ definitions:
         type: integer
         format: int32
         description: "Status de la agenda"
+  DiasNoLaborables:
+    type: object
+    required:
+      - nombre
+      - fecha
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: "Identificador único autoincrementable del día no laboral"
+      nombre:
+        type: string
+        description: "Nombre del día no laboral"
+      fecha:
+        type: string
+        format: date
+        description: "Fecha del día no laboral (AAAA-MM-DD)"
