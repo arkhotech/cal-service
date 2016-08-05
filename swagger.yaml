@@ -74,7 +74,7 @@ paths:
           description: "Error por default"
           schema:
             $ref: "#/definitions/GenericResponse"
-  /agendas/{agenda_id}:
+  /agendas/{agenda_id}/:
     put:
       summary: "Cambia el status de una agenda de activa a inactiva"
       operationId: "ActualizaStatusAgenda"
@@ -105,7 +105,46 @@ paths:
           description: "Error por default"
           schema:
             $ref: "#/definitions/GenericResponse"
-  /agendas/listar/{pagina}:
+  /agendas/listar-por-usuario/{usuario_id}/:
+    get:
+      summary: "Lista todas las instancias de agenda que pertenecen a un usuario"
+      operationId: listarAgendasPorUsuario
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: path
+          required: true
+          type: integer
+          description: "ID del usuario al que le pertenece la agenda"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Agenda"
+        "404":
+          description: "Recurso no encontrado"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /agendas/listar/{pagina}/:
     get:
       summary: "Lista todas las instancias de agenda"
       operationId: listarAgendas
@@ -144,7 +183,7 @@ paths:
           description: "Error por default"
           schema:
             $ref: "#/definitions/GenericResponse"
-  /agendas/filtrar/{texto}:
+  /agendas/filtrar/{texto}/:
     get:
       parameters:
         - name: app_id
@@ -275,6 +314,7 @@ paths:
           description: "Error por default"
           schema:
             $ref: "#/definitions/GenericResponse"
+  /dias-no-laborables/{no_laboral_id}/:
     delete:
       summary: "Elimina un día no laboral"
       operationId: eliminaDiasNoLaborables
@@ -289,6 +329,11 @@ paths:
           description: "ID del usuario que inicio sesión"
           required: true
           type: integer
+        - name: no_laboral_id
+          in: path
+          description: "ID del día no laboral a eliminar"
+          required: true
+          type: integer
       responses:
         "200":
           description: "Success"
@@ -300,6 +345,350 @@ paths:
           description: "Error por default"
           schema:
             $ref: "#/definitions/GenericResponse"
+  /citas/solicitante/listar/{pagina}/:
+    get:
+      summary: "Lista todas las citas futuras solicitadas"
+      operationId: listarCitasSolicitadas
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: pagina
+          in: path
+          required: true
+          type: integer
+          description: "Número de página a obtener (Paginación)"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Cita"
+        "404":
+          description: "Recurso no encontrado"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /citas/solicitante/disponibilidad/{formulario_id}/{agenda_id}/{fecha}/:
+    get:
+      summary: "Lista la disponiblidad de citas en una fecha dada"
+      operationId: listarCitasDisponibles
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: formulario_id
+          in: path
+          required: true
+          type: integer
+          description: "ID del formulario al que pertenece la agenda"
+        - name: agenda_id
+          in: path
+          required: true
+          type: integer
+          description: "ID de la agenda"
+        - name: fecha
+          in: path
+          required: true
+          type: integer
+          description: "Fecha a obtener disponibildad (AAAA-MM-DD)"
+      responses:
+          "200":
+            description: "Success"
+            schema:
+              type: array
+              items:
+                type: object
+          "404":
+            description: "Recurso no encontrado"
+            schema:
+              $ref: "#/definitions/GenericResponse"
+          "500":
+            description: "Error de servidor"
+            schema:
+              $ref: "#/definitions/GenericResponse"
+          "default":
+            description: "Error por default"
+            schema:
+              $ref: "#/definitions/GenericResponse"
+  /citas/solicitante/cancelar/{cita_id}/:
+    put:
+      summary: "Cancela una cita"
+      operationId: "CancelarCita"
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: cita_id
+          in: path
+          description: "ID de la cita a cancelar"
+          required: true
+          type: integer
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/CitaCancelar"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /citas/solicitante/reservar/:
+    post:
+      summary: "Reserva una cita"
+      operationId: "ReservarCita"
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Cita"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /citas/solicitante/confirmar/{cita_id}/:
+    put:
+      summary: "Confirmar una cita"
+      operationId: "ConfirmarCita"
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: cita_id
+          in: path
+          required: true
+          type: integer
+          description: "ID de la cita a confirmar"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /citas/solicitante/:
+    put:
+      summary: "Actualiza una cita"
+      operationId: "ActualizarCita"
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Cita"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /citas/usuario/listar/{pagina}/:
+    get:
+      summary: "Lista todas las citas futuras de un usuario"
+      operationId: listarCitasUsuario
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: pagina
+          in: path
+          required: true
+          type: integer
+          description: "Número de página a obtener (Paginación)"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Cita"
+        "404":
+          description: "Recurso no encontrado"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /citas/usuario/listar/{agenda_id}/{pagina}/:
+    get:
+      summary: "Lista todas las citas futuras de un usuario por agenda"
+      operationId: listarCitasPorAgenda
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: agenda_id
+          in: path
+          required: true
+          type: integer
+          description: "ID de la agenda a obtener las citas"
+        - name: pagina
+          in: path
+          required: true
+          type: integer
+          description: "Número de página a obtener (Paginación)"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Cita"
+        "404":
+          description: "Recurso no encontrado"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /citas/usuario/disponibilidad/{agenda_id}/{fecha}/:
+    get:
+      summary: "Lista la disponiblidad de citas en una fecha dada"
+      operationId: listarCitasUsuarioDisponibles
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: agenda_id
+          in: path
+          required: true
+          type: integer
+          description: "ID de la agenda"
+        - name: fecha
+          in: path
+          required: true
+          type: integer
+          description: "Fecha a obtener disponibildad (AAAA-MM-DD)"
+      responses:
+          "200":
+            description: "Success"
+            schema:
+              type: array
+              items:
+                type: object
+          "404":
+            description: "Recurso no encontrado"
+            schema:
+              $ref: "#/definitions/GenericResponse"
+          "500":
+            description: "Error de servidor"
+            schema:
+              $ref: "#/definitions/GenericResponse"
+          "default":
+            description: "Error por default"
+            schema:
+              $ref: "#/definitions/GenericResponse"
 definitions:
   GenericResponse:
     type: object
@@ -376,3 +765,124 @@ definitions:
         type: string
         format: date
         description: "Fecha del día no laboral (AAAA-MM-DD)"
+  Cita:
+    type: object
+    required:
+      - solicitante_id
+      - nombre_solicitante
+      - email_solicitante
+      - tramite
+      - agenda_id
+      - horario
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: "Identificador único autoincrementable de la cita"
+      formulario_id:
+        type: integer
+        format: int32
+        description: "ID del formulario al que pertenece la agenda"
+      solicitante_id:
+        type: integer
+        format: int32
+        description: "ID del solicitante de la cita"
+      nombre_solicitante:
+        type: string
+        description: "Nombre del solicitante de la cita"
+      email_solicitante:
+        type: string
+        description: "Email del solicitante de la cita"
+      tramite:
+        type: string
+        description: "Descripción del trámite por el cual se realiza la cita"
+      agenda_id:
+        type: integer
+        format: int32
+        description: "ID de la agenda a la que se hace la cita"
+      horario:
+        type: string
+        format: date
+        description: "Horario de la cita (AAAA-MM-DD HH:NN:SS)"
+      fecha_creacion:
+        type: string
+        format: date
+        description: "Fecha en que se crea la cita (AAAA-MM-DD HH:NN:SS)"
+      es_reserva:
+        type: integer
+        format: int32
+        description: "Es una reserva 1 o 0"
+      fecha_modificacion_reserva:
+        type: string
+        format: date
+        description: "Fecha de moficación de la reserva (AAAA-MM-DD HH:NN:SS)"
+      fecha_modificacion_cita:
+        type: string
+        format: date
+        description: "Fecha de modificación de la cita (AAAA-MM-DD HH:NN:SS)"
+      esta_cancelada:
+        type: integer
+        format: int32
+        description: "Está cancelada 1 o 0"
+      fecha_cancelacion:
+        type: string
+        format: date
+        description: "Fecha de cancelación de la cita (AAAA-MM-DD HH:NN:SS)"
+      motivo_cancelacion:
+        type: string
+        format: date
+        description: "Motivo cancelación de la cita"
+  CitaCancelar:
+    type: object
+    required:
+      - motivo_cancelacion
+    properties:
+      motivo_cancelacion:
+        type: string
+        format: date
+        description: "Motivo cancelación de la cita"
+  #BloqueoCita:
+    #type: object
+    #required:
+      #- usuario_id
+      #- agenda_id
+      #- fecha_creacion
+      #- fecha_inicio_bloqueo
+      #- fecha_fin_bloqueo
+      #- motivo_bloqueo
+    #properties:
+      #id:
+        #type: integer
+        #format: int32
+        #description: "Identificador único autoincrementable del bloqueo de la cita"
+      #usuario_id:
+        #type: integer
+        #format: int32
+        #description: "ID de usuario que bloquea la cita"
+      #agenda_id:
+        #type: integer
+        #format: int32
+        #description: "ID de la agenda a la que se le hace el bloqueo"
+      #fecha_creacion:
+        #type: string
+        #format: date
+        #description: "Fecha en que se crea el bloqueo de la cita (AAAA-MM-DD HH:NN:SS)"
+      #fecha_inicio_bloqueo:
+        #type: string
+        #format: date
+        #description: "Fecha en que inicia el bloqueo de la cita (AAAA-MM-DD HH:NN:SS)"
+      #fecha_fin_bloqueo:
+        #type: string
+        #format: date
+        #description: "Fecha en que finaliza el bloqueo de la cita (AAAA-MM-DD HH:NN:SS)"
+      #motivo_bloqueo:
+        #type: string
+        #format: date
+        #description: "Motivo de bloqueo de la cita"
+        
+        
+        
+        
+        
+        
+        
