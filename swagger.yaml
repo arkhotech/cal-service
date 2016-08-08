@@ -436,7 +436,7 @@ paths:
   /citas/solicitante/cancelar/{cita_id}/:
     put:
       summary: "Cancela una cita"
-      operationId: "CancelarCita"
+      operationId: "CancelarCitaSolicitante"
       parameters:
         - name: app_id
           in: header
@@ -453,11 +453,6 @@ paths:
           description: "ID de la cita a cancelar"
           required: true
           type: integer
-        - name: data
-          in: body
-          required: true
-          schema:
-            $ref: "#/definitions/CitaCancelar"
       responses:
         "200":
           description: "Success"
@@ -689,6 +684,109 @@ paths:
             description: "Error por default"
             schema:
               $ref: "#/definitions/GenericResponse"
+  /citas/usuario/asiste/{cita_id}/:
+    put:
+      summary: "Actualiza una cita a asistió o no asistió"
+      operationId: "ActualizarCitaAsiste"
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: cita_id
+          in: path
+          description: "ID de la cita a actualizar"
+          required: true
+          type: integer
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Cita"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /citas/usuario/cancelar/{cita_id}/:
+    put:
+      summary: "Cancela una cita"
+      operationId: "CancelarCitaUsuario"
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: cita_id
+          in: path
+          description: "ID de la cita a cancelar"
+          required: true
+          type: integer
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/CitaCancelar"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+  /bloqueo-dias-agenda:
+    post:
+      summary: "Crea Bloqueo de días sobre una agenda"
+      operationId: "BloqueoDiasAgenda"
+      parameters:
+        - name: app_id
+          in: header
+          description: "ID de la app"
+          required: true
+          type: integer
+        - name: usuario_id
+          in: header
+          description: "ID del usuario que inicio sesión"
+          required: true
+          type: integer
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/BloqueoDiasAgenda"
+      responses:
+        "200":
+          description: "Success"
+        "500":
+          description: "Error de servidor"
+          schema:
+            $ref: "#/definitions/GenericResponse"
+        "default":
+          description: "Error por default"
+          schema:
+            $ref: "#/definitions/GenericResponse"
 definitions:
   GenericResponse:
     type: object
@@ -841,44 +939,44 @@ definitions:
         type: string
         format: date
         description: "Motivo cancelación de la cita"
-  #BloqueoCita:
-    #type: object
-    #required:
-      #- usuario_id
-      #- agenda_id
-      #- fecha_creacion
-      #- fecha_inicio_bloqueo
-      #- fecha_fin_bloqueo
-      #- motivo_bloqueo
-    #properties:
-      #id:
-        #type: integer
-        #format: int32
-        #description: "Identificador único autoincrementable del bloqueo de la cita"
-      #usuario_id:
-        #type: integer
-        #format: int32
-        #description: "ID de usuario que bloquea la cita"
-      #agenda_id:
-        #type: integer
-        #format: int32
-        #description: "ID de la agenda a la que se le hace el bloqueo"
-      #fecha_creacion:
-        #type: string
-        #format: date
-        #description: "Fecha en que se crea el bloqueo de la cita (AAAA-MM-DD HH:NN:SS)"
-      #fecha_inicio_bloqueo:
-        #type: string
-        #format: date
-        #description: "Fecha en que inicia el bloqueo de la cita (AAAA-MM-DD HH:NN:SS)"
-      #fecha_fin_bloqueo:
-        #type: string
-        #format: date
-        #description: "Fecha en que finaliza el bloqueo de la cita (AAAA-MM-DD HH:NN:SS)"
-      #motivo_bloqueo:
-        #type: string
-        #format: date
-        #description: "Motivo de bloqueo de la cita"
+  BloqueoDiasAgenda:
+    type: object
+    required:
+      - usuario_id
+      - agenda_id
+      - fecha_creacion
+      - fecha_inicio_bloqueo
+      - fecha_fin_bloqueo
+      - motivo_bloqueo
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: "Identificador único autoincrementable del bloqueo de la cita"
+      usuario_id:
+        type: integer
+        format: int32
+        description: "ID de usuario que bloquea la cita"
+      agenda_id:
+        type: integer
+        format: int32
+        description: "ID de la agenda a la que se le hace el bloqueo"
+      fecha_creacion:
+        type: string
+        format: date
+        description: "Fecha en que se crea el bloqueo de la cita (AAAA-MM-DD HH:NN:SS)"
+      fecha_inicio_bloqueo:
+        type: string
+        format: date
+        description: "Fecha en que inicia el bloqueo de la cita (AAAA-MM-DD HH:NN:SS)"
+      fecha_fin_bloqueo:
+        type: string
+        format: date
+        description: "Fecha en que finaliza el bloqueo de la cita (AAAA-MM-DD HH:NN:SS)"
+      motivo_bloqueo:
+        type: string
+        format: date
+        description: "Motivo de bloqueo de la cita"
         
         
         
