@@ -5,6 +5,7 @@ info:
     de agendador de citas
   version: 1.0.0
   title: Agenda
+  contact: {}
 host: localhost:80
 basePath: "/v1"
 tags:
@@ -866,8 +867,7 @@ definitions:
         type: string
         description: Motivo cancelación de la cita
       user_id_cancel:
-        type: integer
-        format: int32
+        type: string
         description: ID del usuario que canceló la cita
       user_name_cancel:
         type: string
@@ -886,8 +886,7 @@ definitions:
         type: string
         description: Email del solicitante de la cita
       applyer_id:
-        type: integer
-        format: int32
+        type: string
         description: ID del solicitante de la cita
       applyer_name:
         type: string
@@ -925,8 +924,7 @@ definitions:
         type: string
         description: Fecha en que inicia el bloqueo de la cita (AAAA-MM-DD HH:NN)
       user_id_block:
-        type: integer
-        format: int32
+        type: string
         description: ID del usuario que bloquea el horario
       user_name_block:
         type: string
@@ -962,8 +960,7 @@ definitions:
         type: string
         description: Nombre de la agenda
       owner_id:
-        type: integer
-        format: int32
+        type: string
         description: ID del propietario de la agenda
       owner_name:
         type: string
