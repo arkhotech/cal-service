@@ -25,6 +25,7 @@ paths:
       tags:
       - Appointments
       description: Actualiza una cita a asistió o no asistió
+      operationId: putAppointmentAssistsAppointment_id
       consumes:
       - application/json
       produces:
@@ -59,6 +60,7 @@ paths:
       tags:
       - Appointments
       description: Lista la disponiblidad de citas en una fecha dada
+      operationId: getAppointmentsAvailableCalendar_id
       consumes: []
       produces:
       - application/json
@@ -98,6 +100,7 @@ paths:
       tags:
       - Appointments
       description: Cancela una cita
+      operationId: putAppointmentsCancelAppointment_id
       consumes:
       - application/json
       produces:
@@ -131,6 +134,7 @@ paths:
     put:
       tags:
       - Appointments
+      operationId: putAppointmentsConfirmAppointment_id
       consumes: []
       produces:
       - application/json
@@ -159,6 +163,7 @@ paths:
       tags:
       - Appointments
       description: Lista todas las citas futuras solicitadas de un solicitante
+      operationId: getAppointmentsListByApplyerApplyer_id
       consumes: []
       produces:
       - application/json
@@ -215,6 +220,7 @@ paths:
       tags:
       - Appointments
       description: Lista todas las citas futuras de un usuario por agenda
+      operationId: getAppointmentsListByCalendarCalendar_id
       consumes: []
       produces: []
       parameters:
@@ -244,6 +250,7 @@ paths:
       tags:
       - Appointments
       description: Lista todas las citas futuras solicitadas de un propietario
+      operationId: getAppointmentsListByOwnerOwner_id
       consumes: []
       produces:
       - application/json
@@ -300,6 +307,7 @@ paths:
       tags:
       - Appointments
       description: Reserva una cita
+      operationId: postAppointmentsReserve
       consumes:
       - application/json
       produces:
@@ -328,6 +336,7 @@ paths:
       tags:
       - BlockSchedules
       description: Crea Bloqueo de días sobre una agenda
+      operationId: postBlockSchedules
       consumes:
       - application/json
       produces:
@@ -356,6 +365,7 @@ paths:
       tags:
       - BlockSchedules
       description: Elimina el bloqueo de un horario
+      operationId: deleteBlockSchedulesBlock_schedule_id
       consumes: []
       produces:
       - application/json
@@ -384,6 +394,7 @@ paths:
       tags:
       - Calendars
       description: Lista todas las instancias de agenda
+      operationId: getCalendars
       consumes: []
       produces:
       - application/json
@@ -434,6 +445,7 @@ paths:
       - Calendars
       summary: data
       description: Crea instancias de agenda para un usuario o grupo
+      operationId: postCalendars
       consumes:
       - application/json
       produces:
@@ -448,7 +460,7 @@ paths:
         '201':
           description: ''
           schema:
-            "$ref": "#/definitions/OutputCalendar"
+            "$ref": "#/definitions/OuputCreateCalendar"
         '400':
           description: Error 400
           schema:
@@ -462,6 +474,7 @@ paths:
       tags:
       - Calendars
       description: Deshabilita una agenda
+      operationId: putCalendarsDisableCalendar_id
       consumes: []
       produces:
       - application/json
@@ -490,6 +503,7 @@ paths:
       tags:
       - Calendars
       description: Lista todas las instancias de agenda que pertenecen a un usuario
+      operationId: getCalendarsListByOwnerOwner_id
       consumes: []
       produces:
       - application/json
@@ -534,6 +548,7 @@ paths:
       tags:
       - Calendars
       description: Filtra por nombre de la agenda o propietario de la agenda
+      operationId: getCalendarsSearchByName
       consumes: []
       produces:
       - application/json
@@ -578,6 +593,7 @@ paths:
       - Calendars
       summary: UpdateCalendar
       description: Actualiza una instancia de agenda
+      operationId: putCalendarsCalendar_id
       consumes:
       - application/json
       produces:
@@ -612,6 +628,7 @@ paths:
       tags:
       - DaysOff
       description: Lista todos los días no laborables futuros
+      operationId: getDaysOff
       consumes: []
       produces:
       - application/json
@@ -649,6 +666,7 @@ paths:
       tags:
       - DaysOff
       description: Crea días no laborables
+      operationId: postDaysOff
       consumes:
       - application/json
       produces:
@@ -677,6 +695,7 @@ paths:
       tags:
       - DaysOff
       description: Elimina un día no laboral
+      operationId: deleteDaysOffDay_off_id
       consumes: []
       produces:
       - application/json
@@ -810,6 +829,15 @@ definitions:
         format: int32
         description: Duración que puede tener una cita dentro de la agenda (Definido
           en minutos)
+  CreateCalendar:
+    type: object
+    required:
+    - id
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: ID del calendario que se insertó en DB
   DayOff:
     type: object
     required:
@@ -994,6 +1022,15 @@ definitions:
       name:
         type: string
         description: Nombre del día no laboral
+  OuputCreateCalendar:
+    type: object
+    required:
+    - response
+    properties:
+      calendar:
+        "$ref": "#/definitions/CreateCalendar"
+      response:
+        "$ref": "#/definitions/GenericResponse"
   OuputDayOff:
     type: object
     required:
