@@ -174,13 +174,7 @@ paths:
         required: true
         type: integer
         format: int32
-      - name: limit
-        in: query
-        description: Parámetros de paginación
-        required: true
-        type: integer
-        format: int32
-      - name: offset
+      - name: page
         in: query
         description: Parámetros de paginación
         required: true
@@ -222,7 +216,8 @@ paths:
       description: Lista todas las citas futuras de un usuario por agenda
       operationId: getAppointmentsListByCalendarCalendar_id
       consumes: []
-      produces: []
+      produces:
+      - application/json
       parameters:
       - name: calendar_id
         in: path
@@ -230,13 +225,7 @@ paths:
         required: true
         type: integer
         format: int32
-      - name: limit
-        in: query
-        description: Parámetros de paginación
-        required: true
-        type: integer
-        format: int32
-      - name: offset
+      - name: page
         in: query
         description: Parámetros de paginación
         required: true
@@ -245,6 +234,8 @@ paths:
       responses:
         '200':
           description: OK
+          schema:
+            "$ref": "#/definitions/OutputAppointment"
   "/appointments/listByOwner/{owner_id}":
     get:
       tags:
@@ -261,13 +252,7 @@ paths:
         required: true
         type: integer
         format: int32
-      - name: limit
-        in: query
-        description: Parámetros de paginación
-        required: true
-        type: integer
-        format: int32
-      - name: offset
+      - name: page
         in: query
         description: Parámetros de paginación
         required: true
@@ -399,13 +384,7 @@ paths:
       produces:
       - application/json
       parameters:
-      - name: limit
-        in: query
-        description: Parámetros de paginación
-        required: true
-        type: integer
-        format: int32
-      - name: offset
+      - name: page
         in: query
         description: Parámetros de paginación
         required: true
@@ -1046,6 +1025,7 @@ definitions:
   OutputAppointment:
     type: object
     required:
+    - count
     - response
     properties:
       appointments:
@@ -1053,6 +1033,9 @@ definitions:
         description: Listado de citas futuras
         items:
           "$ref": "#/definitions/Appointment"
+      count:
+        type: integer
+        format: int32
       response:
         "$ref": "#/definitions/GenericResponse"
   OutputAppointmentAvailable:
@@ -1067,10 +1050,15 @@ definitions:
   OutputCalendar:
     type: object
     required:
+    - count
     - response
     properties:
       calendars:
         "$ref": "#/definitions/Calendar"
+      count:
+        type: integer
+        format: int32
+        description: Total de registros
       response:
         "$ref": "#/definitions/GenericResponse"
   SuccessResponse:
