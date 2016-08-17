@@ -947,6 +947,7 @@ definitions:
     - owner_name
     - schedule
     - time_attention
+    - time_cancel_appointment
     properties:
       concurrency:
         type: integer
@@ -981,6 +982,10 @@ definitions:
         description: |-
           Duración que puede tener una cita dentro de la agenda (Definido en
                     minutos)
+      time_cancel_appointment:
+        type: integer
+        format: int32
+        description: Tiempo en el cual el usuario puede cancelar una cita con anterioridad
   InputDayOff:
     type: object
     required:
