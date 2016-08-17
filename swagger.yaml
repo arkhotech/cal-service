@@ -180,7 +180,7 @@ paths:
         required: true
         type: integer
         format: int32
-      - name: app_key
+      - name: appkey
         in: header
         description: App key
         required: true
@@ -258,7 +258,7 @@ paths:
         required: true
         type: integer
         format: int32
-      - name: app key
+      - name: appkey
         in: header
         description: App key
         required: true
@@ -390,7 +390,7 @@ paths:
         required: true
         type: integer
         format: int32
-      - name: app_key
+      - name: appkey
         in: header
         description: App key
         required: true
@@ -439,7 +439,7 @@ paths:
         '201':
           description: ''
           schema:
-            "$ref": "#/definitions/OuputCreateCalendar"
+            "$ref": "#/definitions/OutputCreateCalendar"
         '400':
           description: Error 400
           schema:
@@ -493,7 +493,7 @@ paths:
         required: true
         type: integer
         format: int32
-      - name: app_key
+      - name: appkey
         in: header
         description: App key
         required: true
@@ -537,7 +537,7 @@ paths:
         description: Texto coincidente a buscar en el campo pertenece a o nombre agenda
         required: true
         type: string
-      - name: app_key
+      - name: appkey
         in: header
         description: App key
         required: true
@@ -567,6 +567,37 @@ paths:
           schema:
             "$ref": "#/definitions/ErrorResponse"
   "/calendars/{calendar_id}":
+    get:
+      tags:
+      - Calendars
+      description: Lista un calendario por su ID
+      consumes: []
+      produces:
+      - application/json
+      parameters:
+      - name: calendar_id
+        in: path
+        description: ID del calendario
+        required: true
+        type: integer
+        format: int32
+      responses:
+        '200':
+          description: Success
+          schema:
+            "$ref": "#/definitions/OutputCalendar"
+        '400':
+          description: Error 400
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '404':
+          description: Error 404
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '500':
+          description: Error 500
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
     put:
       tags:
       - Calendars
@@ -612,7 +643,7 @@ paths:
       produces:
       - application/json
       parameters:
-      - name: app_key
+      - name: appkey
         in: header
         description: App key
         required: true
@@ -628,7 +659,7 @@ paths:
           schema:
             type: array
             items:
-              "$ref": "#/definitions/OuputDayOff"
+              "$ref": "#/definitions/OutputDayOff"
         '400':
           description: Error 400
           schema:
@@ -989,12 +1020,12 @@ definitions:
   InputDayOff:
     type: object
     required:
-    - app_key
+    - appkey
     - date_dayoff
     - domain
     - name
     properties:
-      app_key:
+      appkey:
         type: string
         description: App key
       date_dayoff:
@@ -1006,27 +1037,6 @@ definitions:
       name:
         type: string
         description: Nombre del día no laboral
-  OuputCreateCalendar:
-    type: object
-    required:
-    - response
-    properties:
-      calendar:
-        "$ref": "#/definitions/CreateCalendar"
-      response:
-        "$ref": "#/definitions/GenericResponse"
-  OuputDayOff:
-    type: object
-    required:
-    - response
-    properties:
-      daysoff:
-        type: array
-        description: Listado de días no laborales
-        items:
-          "$ref": "#/definitions/DayOff"
-      response:
-        "$ref": "#/definitions/GenericResponse"
   OutputAppointment:
     type: object
     required:
@@ -1064,6 +1074,27 @@ definitions:
         type: integer
         format: int32
         description: Total de registros
+      response:
+        "$ref": "#/definitions/GenericResponse"
+  OutputCreateCalendar:
+    type: object
+    required:
+    - response
+    properties:
+      calendar:
+        "$ref": "#/definitions/CreateCalendar"
+      response:
+        "$ref": "#/definitions/GenericResponse"
+  OutputDayOff:
+    type: object
+    required:
+    - response
+    properties:
+      daysoff:
+        type: array
+        description: Listado de días no laborales
+        items:
+          "$ref": "#/definitions/DayOff"
       response:
         "$ref": "#/definitions/GenericResponse"
   SuccessResponse:
