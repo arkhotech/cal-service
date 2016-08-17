@@ -80,9 +80,7 @@ paths:
         '200':
           description: Success
           schema:
-            type: array
-            items:
-              "$ref": "#/definitions/OutputAppointmentAvailable"
+            "$ref": "#/definitions/OutputAppointmentAvailable"
         '400':
           description: Error 400
           schema:
@@ -177,7 +175,7 @@ paths:
       - name: page
         in: query
         description: Parámetros de paginación
-        required: true
+        required: false
         type: integer
         format: int32
       - name: appkey
@@ -194,9 +192,7 @@ paths:
         '200':
           description: Success
           schema:
-            type: array
-            items:
-              "$ref": "#/definitions/OutputAppointment"
+            "$ref": "#/definitions/OutputAppointment"
         '400':
           description: Error 400
           schema:
@@ -228,7 +224,7 @@ paths:
       - name: page
         in: query
         description: Parámetros de paginación
-        required: true
+        required: false
         type: integer
         format: int32
       responses:
@@ -236,6 +232,18 @@ paths:
           description: OK
           schema:
             "$ref": "#/definitions/OutputAppointment"
+        '400':
+          description: Error 400
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '404':
+          description: Error 404
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '500':
+          description: Error 500
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
   "/appointments/listByOwner/{owner_id}":
     get:
       tags:
@@ -255,7 +263,7 @@ paths:
       - name: page
         in: query
         description: Parámetros de paginación
-        required: true
+        required: false
         type: integer
         format: int32
       - name: appkey
@@ -272,9 +280,7 @@ paths:
         '200':
           description: Success
           schema:
-            type: array
-            items:
-              "$ref": "#/definitions/OutputAppointment"
+            "$ref": "#/definitions/OutputAppointment"
         '400':
           description: Error 400
           schema:
@@ -387,7 +393,7 @@ paths:
       - name: page
         in: query
         description: Parámetros de paginación
-        required: true
+        required: false
         type: integer
         format: int32
       - name: appkey
@@ -404,9 +410,7 @@ paths:
         '200':
           description: Success
           schema:
-            type: array
-            items:
-              "$ref": "#/definitions/OutputCalendar"
+            "$ref": "#/definitions/OutputCalendar"
         '400':
           description: Error 400
           schema:
@@ -507,9 +511,7 @@ paths:
         '200':
           description: Success
           schema:
-            type: array
-            items:
-              "$ref": "#/definitions/OutputCalendar"
+            "$ref": "#/definitions/OutputCalendar"
         '400':
           description: Error 400
           schema:
@@ -551,9 +553,7 @@ paths:
         '200':
           description: Success
           schema:
-            type: array
-            items:
-              "$ref": "#/definitions/OutputCalendar"
+            "$ref": "#/definitions/OutputCalendar"
         '400':
           description: Error 400
           schema:
@@ -657,9 +657,7 @@ paths:
         '200':
           description: Success
           schema:
-            type: array
-            items:
-              "$ref": "#/definitions/OutputDayOff"
+            "$ref": "#/definitions/OutputDayOff"
         '400':
           description: Error 400
           schema:
@@ -1059,7 +1057,9 @@ definitions:
     - response
     properties:
       appointmentsavailable:
-        "$ref": "#/definitions/AppointmentAvailable"
+        type: array
+        items:
+          "$ref": "#/definitions/AppointmentAvailable"
       response:
         "$ref": "#/definitions/GenericResponse"
   OutputCalendar:
@@ -1069,7 +1069,9 @@ definitions:
     - response
     properties:
       calendars:
-        "$ref": "#/definitions/Calendar"
+        type: array
+        items:
+          "$ref": "#/definitions/Calendar"
       count:
         type: integer
         format: int32
