@@ -538,7 +538,7 @@ if( requestBody.contains("some data") )
     return "Response N"
 }
 */
-</con:dispatchPath><con:response name="Response 1" id="7f795306-bdc9-4c9c-b6d4-1efd6e61cc29" httpResponseStatus="200"><con:settings/></con:response></con:restMockAction><con:restMockAction name="/v1/calendars" method="GET" resourcePath="/v1/calendars" id="e8e85b63-9451-4789-9f27-1224bd54fe52"><con:settings/><con:defaultResponse>serverError</con:defaultResponse><con:dispatchStyle>SCRIPT</con:dispatchStyle><con:dispatchPath>// Match based on header
+</con:dispatchPath><con:response name="Response 1" id="7f795306-bdc9-4c9c-b6d4-1efd6e61cc29" httpResponseStatus="200"><con:settings/></con:response></con:restMockAction><con:restMockAction name="/v1/calendars" method="GET" resourcePath="/v1/calendars" id="e8e85b63-9451-4789-9f27-1224bd54fe52"><con:settings/><con:defaultResponse>fullList</con:defaultResponse><con:dispatchStyle>SCRIPT</con:dispatchStyle><con:dispatchPath>// Match based on header
 
 log.info mockRequest.getRequestHeaders()
 
