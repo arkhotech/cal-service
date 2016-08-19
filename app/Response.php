@@ -75,16 +75,15 @@ class Response {
      * @return Illuminate/Http/Response
      */
     public static function make($code, $data = null)
-    {        
-        $c[] = array(
-            'response' => array(
-                'code' => $code,
-                'message' => self::getStatusCode($code)
-            )
-        );
-        array_push($c, $data);
-     
+    {
         if ($data !== null) {
+            $c[] = array(
+                'response' => array(
+                    'code' => $code,
+                    'message' => self::getStatusCode($code)
+                )
+            );
+            array_push($c, $data);        
             $resp = response($c, $code);
         } else {
             $resp = response([
@@ -216,7 +215,8 @@ class Response {
             1010 => 'No calendar found',
             1020 => 'Missing params request or malformed',
             1030 => 'Appkey or domain do not exist',
-			1040 => 'Calendar name must be unique by appkey and domain'
+			1040 => 'Calendar name must be unique by appkey and domain',
+            1050 => 'Can not update row. Calendar has appointments availables'
         );
         
 		$result = (isset($codes[$code])) ? $codes[$code] : 'Unknown Status Code';

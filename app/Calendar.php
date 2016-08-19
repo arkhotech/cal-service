@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Calendar extends Model
 {    
-	protected $table = 'calendars';
+	//protected $table = 'calendars';
     
     public $timestamps = false;
     
@@ -25,8 +25,10 @@ class Calendar extends Model
         'time_attention',
         'concurrency',
         'ignore_non_working_days',
+        'time_cancel_appointment',
         'appkey',
-        'domain'
+        'domain',
+        'status'
     );
     
     protected $hidden = array(
@@ -34,4 +36,12 @@ class Calendar extends Model
         'domain',
         'status'
     );
+    
+    /**
+     * Obtiene todas las citas que pertenecen a un calendario
+     */
+    public function appointments()
+    {
+        return $this->hasMany('App\Appointment');
+    }
 }

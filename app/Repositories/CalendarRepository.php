@@ -8,6 +8,7 @@
 
 namespace App\Repositories;
 
+use Log;
 use App\Calendar;
 use App\App;
 use Illuminate\Support\Facades\Cache;
@@ -49,7 +50,7 @@ class CalendarRepository
                             ->where('status', 1)->get();
                     
                     $res['data'] = $calendars;
-                    $res['count'] = count($calendars);                    
+                    $res['count'] = $calendars->count();
                 }
                 $res['error'] = null;
                 
@@ -65,7 +66,7 @@ class CalendarRepository
     }
     
     /**
-     * crea un nuevo registro de tipo calendario
+     * Crea un nuevo registro de tipo calendario
      * 
      * @param array $data
      * @return Collection
@@ -80,7 +81,7 @@ class CalendarRepository
                             ->where('status', 1)->value('appkey');
             
             if ($apps) {
-                $data['status'] = 1;
+                $data['status'] = 1;                
                 $calendar = Calendar::create($data);
                 $res['id'] = $calendar->id;
                 $res['error'] = null;
@@ -98,5 +99,73 @@ class CalendarRepository
         }
         
         return $res;
+    }
+    
+    /**
+     * Actualiza un nuevo registro de tipo calendario
+     * 
+     * @param array $data
+     * @param int $id
+     * @return Collection
+     */
+    public function updateCalendar($data, $id)
+    {
+        $res = array();
+        
+        try {
+            
+            if (!$this->hasAvailableAppointments($id)) {
+                unset($data['appkey']);
+                unset($data['domain']);
+                unset($data['status']);
+
+                $calendar = Calendar::where('id', $id)->update($data);
+                $res['error'] = $calendar === false ? new \Exception('', 500) : null;
+            } else {
+                $res['error'] = new \Exception('', 1050);
+            }
+        } catch (QueryException $qe) {
+            if ($qe->getCode() == 23000) {
+                $res['error'] = new \Exception('', 1040);
+            } else {
+                $res['error'] = $qe;
+            }
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }
+        
+        return $res;
+    }
+    
+    /**
+     * Retorna un booleano si un calendario tiene citas disponibles
+     * 
+     * @param mixed $id null/int
+     * @return boolean
+     */
+    public function hasAvailableAppointments($id)
+    {
+        $resp = true;
+        try {
+            if ((int)$id > 0) {
+                $ttl = (int)config('calendar.cache_ttl');
+                $cache_id = sha1('cacheCalendarAppointment_'.$id);
+
+                $appointments = Cache::remember($cache_id, $ttl, function() use($id) {
+                    $results = Calendar::find($id)
+                            ->appointments()
+                            ->where('is_canceled', '<>', 1)
+                            ->where('appoinment_time', '>=', date('Y-m-d H:i:s'))->get();
+
+                    return $results;
+                });
+
+                $resp = $appointments->count() ? true : false;
+            }
+        } catch (Exception $e) {
+            Log::error('code: ' .  $e->getCode() . ' Message: ' . $e->getMessage());
+        }        
+        
+        return $resp;
     }
 }

@@ -108,15 +108,45 @@ class CalendarController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Actualiza un registro de tipo calendario.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        //
+    {        
+        $resp = array();
+        $data = $request->json()->all();
+        
+        $validator = Validator::make($data, [
+            'name' => 'required',
+            'owner_id' => 'required',
+            'owner_name' => 'required',
+            'is_group' => 'required|boolean',
+            'schedule' => 'required',
+            'time_attention' => 'bail|required|integer',
+            'concurrency' => 'bail|required|integer',
+            'ignore_non_working_days' => 'required|boolean',
+            'time_cancel_appointment' => 'required|integer',
+            'appkey' => 'required',
+            'domain' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            $resp = Resp::error(400, 1020);            
+        } else {
+            $calendars = $this->calendars->updateCalendar($data, $id);
+            
+            if (isset($calendars['error']) && is_a($calendars['error'], 'Exception')) {                
+                $resp = Resp::error(500, $calendars['error']->getCode(), $calendars['error']);
+            } else {
+                $id = isset($calendars['id']) ? (int)$calendars['id'] : 0;
+                $resp = Resp::make(200);
+            }
+        }
+        
+        return $resp;
     }
 
     /**

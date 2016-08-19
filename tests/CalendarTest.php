@@ -6,8 +6,12 @@
  * @author Geovanni Escalante <gescalante@arkho.tech>
  */
 
+use Illuminate\Foundation\Testing\WithoutMiddleware;
+
 class CalendarTest extends TestCase
 {
+    use WithoutMiddleware;
+    
     /**
      * Test Get Request calendars
      *
