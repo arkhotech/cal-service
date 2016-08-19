@@ -12,5 +12,8 @@
 */
 
 Route::group(array('prefix' => 'v1'), function() {
+    
+    //Calendar
     Route::get('calendars', 'CalendarController@index', ['only' => ['index']]);
+    Route::post('calendars', 'CalendarController@store', ['only' => ['store']]);
 });

@@ -83,7 +83,7 @@ class Response {
             )
         );
         array_push($c, $data);
-        
+     
         if ($data !== null) {
             $resp = response($c, $code);
         } else {
@@ -102,10 +102,11 @@ class Response {
      * Retorna un Objeto de tipo Illuminate/Http/Response
      * 
      * @param int $code
+     * @param int $internalCode
      * @param mixed Exception/null e
      * @return Illuminate/Http/Response
      */
-    public static function error($code, Exception $e = null)
+    public static function error($code, $internalCode, $e = null)
     {        
         if ($code === 500) {
             if ($e !== null && is_a($e, 'Exception')) {
@@ -113,12 +114,23 @@ class Response {
             }
         }
         
-        $resp = response([
-            'response' => array(
-                'code' => $code,
-                'message' => self::getStatusCode($code)
-            )], $code
-        );
+        //Mis mensajes de errores personalizados
+        if ($internalCode > 1000) {            
+            $resp = response([
+                'response' => array(
+                    'code' => $internalCode,
+                    'message' => self::getCustomMessage($internalCode)
+                )], $code
+            );
+        } else {
+            //Errores estandar
+            $resp = response([
+                'response' => array(
+                    'code' => $code,
+                    'message' => self::getStatusCode($code)
+                )], $code
+            );
+        }
         
         return $resp;
     }
@@ -186,6 +198,27 @@ class Response {
 			509 => 'Bandwidth Limit Exceeded'
 		);
 
+		$result = (isset($codes[$code])) ? $codes[$code] : 'Unknown Status Code';
+
+		return $result;
+	}
+    
+    /**
+     * Retorna un mensaje personalizado de error
+     * 
+     * @param int $code     
+     * @return string
+     */
+    public static function getCustomMessage($code)
+    {
+		$codes = array(
+            //Calendar
+            1010 => 'No calendar found',
+            1020 => 'Missing params request or malformed',
+            1030 => 'Appkey or domain do not exist',
+			1040 => 'Calendar name must be unique by appkey and domain'
+        );
+        
 		$result = (isset($codes[$code])) ? $codes[$code] : 'Unknown Status Code';
 
 		return $result;

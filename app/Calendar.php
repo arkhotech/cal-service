@@ -14,6 +14,8 @@ class Calendar extends Model
 {    
 	protected $table = 'calendars';
     
+    public $timestamps = false;
+    
 	protected $fillable = array(
         'name',
         'owner_id',
@@ -23,12 +25,12 @@ class Calendar extends Model
         'time_attention',
         'concurrency',
         'ignore_non_working_days',
-        'app_key',
+        'appkey',
         'domain'
     );
     
     protected $hidden = array(
-        'app_key',
+        'appkey',
         'domain',
         'status'
     );

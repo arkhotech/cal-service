@@ -9,7 +9,9 @@
 namespace App\Repositories;
 
 use App\Calendar;
+use App\App;
 use Illuminate\Support\Facades\Cache;
+use \Illuminate\Database\QueryException;
 
 class CalendarRepository
 {
@@ -26,7 +28,7 @@ class CalendarRepository
         $res = array();
         $page = (int)$page;
         
-        try {
+        try {            
             $ttl = (int)config('calendar.cache_ttl');
             $cache_id = sha1('cacheCalendarList_'.$appkey.'_'.$domain.'_'.$page);
             
@@ -53,9 +55,47 @@ class CalendarRepository
                 
                 return $res;
             });
+        } catch (QueryException $qe) {
+            $res['error'] = $qe;
         } catch (Exception $e) {
             $res['error'] = $e;
         }        
+        
+        return $res;
+    }
+    
+    /**
+     * crea un nuevo registro de tipo calendario
+     * 
+     * @param array $data
+     * @return Collection
+     */
+    public function createCalendar($data)
+    {
+        $res = array();
+        
+        try {            
+            $apps = App::where('appkey', $data['appkey'])
+                            ->where('domain', $data['domain'])
+                            ->where('status', 1)->value('appkey');
+            
+            if ($apps) {
+                $data['status'] = 1;
+                $calendar = Calendar::create($data);
+                $res['id'] = $calendar->id;
+                $res['error'] = null;
+            } else {
+                $res['error'] = new \Exception('', 1030);
+            }
+        } catch (QueryException $qe) {
+            if ($qe->getCode() == 23000) {
+                $res['error'] = new \Exception('', 1040);
+            } else {
+                $res['error'] = $qe;
+            }
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }
         
         return $res;
     }
