@@ -216,7 +216,8 @@ class Response {
             1020 => 'Missing params request or malformed',
             1030 => 'Appkey or domain do not exist',
 			1040 => 'Calendar name must be unique by appkey and domain',
-            1050 => 'Can not update row. Calendar has appointments availables'
+            1050 => 'Can not update row. Calendar has appointments availables',
+            1060 => 'Can not disable row. Calendar has appointments availables'
         );
         
 		$result = (isset($codes[$code])) ? $codes[$code] : 'Unknown Status Code';

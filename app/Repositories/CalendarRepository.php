@@ -66,6 +66,40 @@ class CalendarRepository
     }
     
     /**
+     * Obtiene todos los calendarios por una appkey y domain
+     *      
+     * @param int $id
+     * @return Collection
+     */
+    public function listCalendarById($id)
+    {
+        $res = array();
+        
+        try {            
+            $ttl = (int)config('calendar.cache_ttl');
+            $cache_id = sha1('cacheCalendarListById_'.$id);
+            
+            $res = Cache::remember($cache_id, $ttl, function() use($id) {
+                if ((int)$id > 0) {
+                    $calendars = Calendar::find($id);
+                    
+                    $res['data'] = $calendars;
+                    $res['count'] = 1;
+                }
+                $res['error'] = null;
+                
+                return $res;
+            });
+        } catch (QueryException $qe) {
+            $res['error'] = $qe;
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }        
+        
+        return $res;
+    }
+    
+    /**
      * Crea un nuevo registro de tipo calendario
      * 
      * @param array $data
@@ -130,6 +164,34 @@ class CalendarRepository
             } else {
                 $res['error'] = $qe;
             }
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }
+        
+        return $res;
+    }
+    
+    /**
+     * Deshabilita un registro de tipo calendario
+     *      
+     * @param int $id
+     * @return Collection
+     */
+    public function disableCalendar($id)
+    {
+        $res = array();
+        
+        try {
+            
+            if (!$this->hasAvailableAppointments($id)) {
+
+                $calendar = Calendar::where('id', $id)->update(array('status' => 0));
+                $res['error'] = $calendar === false ? new \Exception('', 500) : null;
+            } else {
+                $res['error'] = new \Exception('', 1060);
+            }
+        } catch (QueryException $qe) {            
+                $res['error'] = $qe;
         } catch (Exception $e) {
             $res['error'] = $e;
         }

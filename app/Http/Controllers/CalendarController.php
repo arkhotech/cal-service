@@ -65,7 +65,37 @@ class CalendarController extends Controller
         
         return $resp;
     }
-
+    
+    /**
+     * Controller que despliega un calendario por ID
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function findById($id)
+    {
+        $resp = array();
+        
+        if ((int)$id > 0) {
+            $calendars = $this->calendars->listCalendarById($id);
+            
+            if (isset($calendars['error']) && is_a($calendars['error'], 'Exception')) {
+                $resp = Resp::error(500, $calendars['error']->getCode(), $calendars['error']);
+            } else {
+                if (count($calendars['data']) > 0) {
+                    $calendar['calendars'] = $calendars['data'];
+                    $calendar['count'] = $calendars['count'];
+                    $resp = Resp::make(200, $calendar);
+                } else {
+                    $resp = Resp::error(404, 1010);
+                }
+            }
+        } else {
+            $resp = Resp::error(400, 1020);
+        }
+        
+        return $resp;
+    }
+    
     /**
      * Crea un nuevo registro de tipo calendario
      *
@@ -150,13 +180,27 @@ class CalendarController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Deshabilita un registro de tipo calendar
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function disable($id)
     {
-        //
+        $resp = array();
+
+        if ((int)$id <= 0) {
+            $resp = Resp::error(400, 1020);            
+        } else {
+            $calendars = $this->calendars->disableCalendar($id);
+            
+            if (isset($calendars['error']) && is_a($calendars['error'], 'Exception')) {                
+                $resp = Resp::error(500, $calendars['error']->getCode(), $calendars['error']);
+            } else {
+                $resp = Resp::make(200);
+            }
+        }
+        
+        return $resp;
     }
 }
