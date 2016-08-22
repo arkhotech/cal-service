@@ -875,17 +875,17 @@ if( requestBody.contains("some data") )
   },
   "daysoff":[
       {
-        "date_dayoff":"22/08/2016",
+        "date_dayoff":"2016-08-22",
         "id":1,
         "name":"cita3"
       },
       {
-        "date_dayoff":"15/08/2016",
+        "date_dayoff":"2016-08-15",
         "id":2,
         "name":"cita2"
       },
       {
-        "date_dayoff":"05/08/2016",
+        "date_dayoff":"2016-08-05",
         "id":3,
         "name":"cita1"
       }
