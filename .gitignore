@@ -1,7 +1,5 @@
-/nbproject
-/vendor
-/node_modules
-/public/storage
-Homestead.yaml
-Homestead.json
-.env
+/application/local/storage
+/application/local/Homestead.yaml
+/application/local/Homestead.json
+/application/local/.env
+/application/nbproject
