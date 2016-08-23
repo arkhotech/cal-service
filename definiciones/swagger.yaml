@@ -977,6 +977,7 @@ definitions:
     - schedule
     - time_attention
     - time_cancel_appointment
+    - time_confirm_appointment
     properties:
       concurrency:
         type: integer
@@ -1015,6 +1016,11 @@ definitions:
         type: integer
         format: int32
         description: Tiempo en el cual el usuario puede cancelar una cita con anterioridad
+      time_confirm_appointment:
+        type: integer
+        format: int32
+        description: Tiempo que tiene un usuario para confirmar una cita reservada,
+          de lo contrario queda liberada
   InputDayOff:
     type: object
     required:

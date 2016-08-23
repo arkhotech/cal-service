@@ -42,7 +42,7 @@ CREATE TABLE `appointments` (
   PRIMARY KEY (`id`),
   KEY `ix_appoinments_calendar_id` (`calendar_id`),
   CONSTRAINT `fk_appoinments_calendar_id` FOREIGN KEY (`calendar_id`) REFERENCES `calendars` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -101,8 +101,9 @@ CREATE TABLE `calendars` (
   `schedule` text NOT NULL,
   `time_attention` int(11) NOT NULL,
   `concurrency` int(11) NOT NULL,
-  `ignore_non_working_days` varchar(45) DEFAULT NULL,
+  `ignore_non_working_days` tinyint(4) DEFAULT '0',
   `time_cancel_appointment` tinyint(11) DEFAULT NULL,
+  `time_confirm_appointment` tinyint(4) NOT NULL,
   `appkey` varchar(15) NOT NULL,
   `domain` varchar(150) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
@@ -111,7 +112,7 @@ CREATE TABLE `calendars` (
   KEY `ix_calendars_owner_name` (`owner_name`),
   KEY `fk_calendars_app_key_idx` (`appkey`,`domain`),
   CONSTRAINT `fk_calendars_app_key_domain` FOREIGN KEY (`appkey`, `domain`) REFERENCES `apps` (`appkey`, `domain`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -131,7 +132,7 @@ CREATE TABLE `non_working_days` (
   KEY `ix_non_working_days_app_key` (`appkey`),
   KEY `fk_non_working_days_app_key_idx` (`appkey`,`domain`),
   CONSTRAINT `fk_non_working_days_app_key` FOREIGN KEY (`appkey`, `domain`) REFERENCES `apps` (`appkey`, `domain`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -143,4 +144,4 @@ CREATE TABLE `non_working_days` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-08-19  9:12:23
+-- Dump completed on 2016-08-23 14:25:55
