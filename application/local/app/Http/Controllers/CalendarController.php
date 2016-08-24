@@ -141,22 +141,52 @@ class CalendarController extends Controller
         $data = $request->json()->all();
         
         $validator = Validator::make($data, [
-            'name' => 'required',
-            'owner_id' => 'required',
-            'owner_name' => 'required',
+            'name' => 'bail|required|max:80',
+            'owner_id' => 'bail|required|max:20',
+            'owner_name' => 'bail|required|max:150',
             'is_group' => 'required|boolean',
             'schedule' => 'required',
             'time_attention' => 'bail|required|integer',
             'concurrency' => 'bail|required|integer',
             'ignore_non_working_days' => 'required|boolean',
             'time_cancel_appointment' => 'required|integer',
-            'appkey' => 'required',
-            'domain' => 'required'
+            'appkey' => 'bail|required|max:15',
+            'domain' => 'bail|required|max:150'
         ]);
 
         if ($validator->fails()) {
-            $resp = Resp::error(400, 1020);            
-        } else {
+            $resp = Resp::error(400, 1020);
+        } else {            
+            $schedule =  $data['schedule'];             
+            $days = array('lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo');
+            
+            foreach ($schedule as $key => $value) {
+                
+                //Verifico que sea un dia valido
+                if (!in_array($key, $days))
+                    return Resp::error(400, 1020);
+                
+                foreach ($value as $k => $time) {                    
+                    $val = explode('-', $time);
+                    $count = is_array($val) ? count($val) : 0;
+                    
+                    //Verifico que venga un rango de horas
+                    if ($count == 2) {
+                        $start = preg_match('#([0-1]{1}[0-9]{1}|[2]{1}[0-3]{1}):[0-5]{1}[0-9]{1}#', $val[0]);
+                        $end = preg_match('#([0-1]{1}[0-9]{1}|[2]{1}[0-3]{1}):[0-5]{1}[0-9]{1}#', $val[1]);
+                        
+                        //Verifico que sea una hora valida ej: 18:00
+                        if ($start === 1 && $end === 1) {
+                            $data['schedule'] = serialize($data['schedule']);
+                        } else {
+                            return Resp::error(400, 1020);
+                        }
+                    } else {
+                        return Resp::error(400, 1020);
+                    }
+                }
+            }
+            
             $calendars = $this->calendars->createCalendar($data);
             
             if (isset($calendars['error']) && is_a($calendars['error'], 'Exception')) {                

@@ -1005,7 +1005,24 @@ definitions:
         description: Nombre del propietario de la agenda
       schedule:
         type: string
-        description: Horario del trámite (Data serializada)
+        description: |-
+          Horario del trámite ej:
+
+          "schedule": {
+                  "lunes": {
+                      "0": "08:00-12:00",
+                      "1": "14:00-18:00",
+                      "2": "20:00-22:00"
+                  },
+                  "martes": {
+                      "0": "08:00-12:00",
+                      "1": "14:00-18:00"
+                  },
+                  "miercoles": {
+                      "0": "08:00-12:00",
+                      "1": "14:00-18:00"
+                  }
+              }
       time_attention:
         type: integer
         format: int32
