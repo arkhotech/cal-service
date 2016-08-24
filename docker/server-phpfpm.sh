@@ -1,6 +1,7 @@
 #!/bin/bash 
 
-IMAGE=php:5.6-fpm
+IMAGE=arkhotech/cal-service 
+#php:5.6-fpm
 NAME=phpfpm
 DOCKERFILE=phpfpm.dockerfile 
 ROOT_DIR=$('pwd')
@@ -33,7 +34,6 @@ case $1 in
      echo "Creando un nuevo container"
      docker run -i -d -t --name $NAME \
 	--hostname agendas \
-	--link 
         -p 9000:9000 -v $WEBROOT:$INTERNAL_PATH  $IMAGE 
 ;;
 'remove')

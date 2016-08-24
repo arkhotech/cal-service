@@ -1,14 +1,3 @@
-FROM egob/simple:v1.5
+FROM php:5.6-fpm
 
-
-RUN echo "deb http://packages.dotdeb.org wheezy-php56 all" >> /etc/apt/sources.list ; \
-    echo "deb-src http://packages.dotdeb.org wheezy-php56 all " >> /etc/apt/sources.list 
-
-RUN apt-get update
-
-RUN apt-get install -y wget ; \
-    wget http://www.dotdeb.org/dotdeb.gpg -O- | apt-key add - 
-
-
-RUN apt-get install -y -f  --force-yes libapache2-mod-php5  php5 php5-fpm 
-
+RUN awk '$1 ~ "^deb" { $3 = $3 "-backports"; print; exit }' /etc/apt/sources.list > /etc/apt/sources.list.d/backports.list 
