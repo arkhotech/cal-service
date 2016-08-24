@@ -968,7 +968,9 @@ definitions:
   InputCalendar:
     type: object
     required:
+    - appkey
     - concurrency
+    - domain
     - ignore_non_working_days
     - is_group
     - name
@@ -979,16 +981,21 @@ definitions:
     - time_cancel_appointment
     - time_confirm_appointment
     properties:
+      appkey:
+        type: string
+        description: App key
       concurrency:
         type: integer
         format: int32
         description: Cantidad de citas que se pueden agendar en la misma hora
+      domain:
+        type: string
+        description: Dominios de una App
       ignore_non_working_days:
         type: integer
         format: int32
-        description: |-
-          Si este campo esta en 1, entonces este calendario ignora los feriados
-                    globales
+        description: Si este campo esta en 1, entonces este calendario ignora los
+          feriados globales sino coloque 0
       is_group:
         type: integer
         format: int32
