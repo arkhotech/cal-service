@@ -77,10 +77,10 @@ class DayOffController extends Controller
         $data = $request->json()->all();
         
         $validator = Validator::make($data, [
-            'name' => 'required',
+            'name' => 'bail|required|max:70',
             'date_dayoff' => 'bail|required|date_format:Y-m-d',
-            'appkey' => 'required',
-            'domain' => 'required'
+            'appkey' => 'required|max:15',
+            'domain' => 'required|max:150'
         ]);
 
         if ($validator->fails()) {
