@@ -12,3 +12,9 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install -j$(nproc) gd
 
 RUN docker-php-ext-install pdo pdo_mysql
+
+RUN mv /usr/local/etc/php-fpm.d/www.conf /usr/local/etc/php-fpm.d/www.conf.bak
+ 
+COPY assets/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+
+COPY assets/docker.conf /usr/local/etc/php-fpm.d/docker.conf
