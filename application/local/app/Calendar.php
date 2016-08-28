@@ -20,6 +20,7 @@ class Calendar extends Model
         'name',
         'owner_id',
         'owner_name',
+        'owner_email',
         'is_group',
         'schedule',
         'time_attention',
@@ -32,8 +33,6 @@ class Calendar extends Model
     );
     
     protected $hidden = array(
-        'appkey',
-        'domain',
         'status'
     );
     

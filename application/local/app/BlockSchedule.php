@@ -29,12 +29,4 @@ class BlockSchedule extends Model
     protected $hidden = array(
         'created_date'
     );
-    
-    /**
-     * Obtiene todas las citas que pertenecen a un calendario
-     */
-    public function appointments()
-    {
-        return $this->hasMany('App\Appointment');
-    }
 }

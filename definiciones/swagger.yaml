@@ -20,6 +20,7 @@ tags:
 schemes:
 - http
 paths:
+  "/appointment": {}
   "/appointment/assists/{appointment_id}":
     put:
       tags:
@@ -37,6 +38,16 @@ paths:
         required: true
         type: integer
         format: int32
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       - in: body
         name: body
         required: false
@@ -76,6 +87,16 @@ paths:
         description: Fecha a obtener disponibildad de cita (AAAA-MM-DD)
         required: true
         type: string
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de una aplicación
+        required: true
+        type: string
       responses:
         '200':
           description: Success
@@ -110,6 +131,16 @@ paths:
         required: true
         type: integer
         format: int32
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       - in: body
         name: body
         required: false
@@ -122,6 +153,10 @@ paths:
             "$ref": "#/definitions/SuccessResponse"
         '400':
           description: Error 400
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '406':
+          description: Error 406
           schema:
             "$ref": "#/definitions/ErrorResponse"
         '500':
@@ -143,6 +178,16 @@ paths:
         required: true
         type: integer
         format: int32
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       responses:
         '200':
           description: Success
@@ -150,6 +195,10 @@ paths:
             "$ref": "#/definitions/SuccessResponse"
         '400':
           description: Error 400
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '406':
+          description: Error 406
           schema:
             "$ref": "#/definitions/ErrorResponse"
         '500':
@@ -227,6 +276,16 @@ paths:
         required: false
         type: integer
         format: int32
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de una aplicación
+        required: true
+        type: string
       responses:
         '200':
           description: OK
@@ -304,6 +363,16 @@ paths:
       produces:
       - application/json
       parameters:
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       - in: body
         name: body
         required: false
@@ -313,9 +382,13 @@ paths:
         '201':
           description: Success
           schema:
-            "$ref": "#/definitions/SuccessResponse"
+            "$ref": "#/definitions/OutputCreateAppointment"
         '400':
           description: Error 400
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '406':
+          description: Error 406
           schema:
             "$ref": "#/definitions/ErrorResponse"
         '500':
@@ -323,6 +396,26 @@ paths:
           schema:
             "$ref": "#/definitions/ErrorResponse"
   "/blockSchedules":
+    get:
+      tags:
+      - BlockSchedules
+      description: Lista todos los días no laborables del año actual
+      consumes: []
+      produces: []
+      parameters:
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de una aplicación
+        required: true
+        type: string
+      responses:
+        '200':
+          description: OK
     post:
       tags:
       - BlockSchedules
@@ -333,6 +426,16 @@ paths:
       produces:
       - application/json
       parameters:
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       - in: body
         name: body
         required: false
@@ -367,6 +470,16 @@ paths:
         required: true
         type: integer
         format: int32
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       responses:
         '200':
           description: Success
@@ -434,6 +547,16 @@ paths:
       produces:
       - application/json
       parameters:
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       - in: body
         name: body
         required: false
@@ -468,6 +591,16 @@ paths:
         required: true
         type: integer
         format: int32
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       responses:
         '200':
           description: Success
@@ -581,6 +714,16 @@ paths:
         required: true
         type: integer
         format: int32
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de una aplicación
+        required: true
+        type: string
       responses:
         '200':
           description: Success
@@ -615,6 +758,16 @@ paths:
         required: true
         type: integer
         format: int32
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       - in: body
         name: body
         required: false
@@ -680,6 +833,16 @@ paths:
       produces:
       - application/json
       parameters:
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       - in: body
         name: body
         required: false
@@ -714,6 +877,16 @@ paths:
         required: true
         type: integer
         format: int32
+      - name: appkey
+        in: header
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: header
+        description: Dominio de la aplicación
+        required: true
+        type: string
       responses:
         '200':
           description: Success
@@ -798,10 +971,13 @@ definitions:
     - ignore_non_working_days
     - is_group
     - name
+    - owner_email
     - owner_id
     - owner_name
     - schedule
     - time_attention
+    - time_cancel_appointment
+    - time_confirm_appointment
     properties:
       concurrency:
         type: integer
@@ -823,6 +999,9 @@ definitions:
       name:
         type: string
         description: Nombre de la agenda
+      owner_email:
+        type: string
+        description: Email del propietario del calendario
       owner_id:
         type: string
         description: ID del usuario o grupo al que se le va a asignar la agenda
@@ -837,6 +1016,25 @@ definitions:
         format: int32
         description: Duración que puede tener una cita dentro de la agenda (Definido
           en minutos)
+      time_cancel_appointment:
+        type: integer
+        format: int32
+        description: Tiempo en que se puede cancelar una cita en cada agenda antes
+          de que inicie le cita
+      time_confirm_appointment:
+        type: integer
+        format: int32
+        description: Tiempo para eliminar citas reservadas de una agenda que no han
+          sido confirmadas
+  CreateAppointment:
+    type: object
+    required:
+    - id
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: ID de la cita que se insertó en DB
   CreateCalendar:
     type: object
     required:
@@ -895,7 +1093,6 @@ definitions:
   InputAppointmentCancel:
     type: object
     required:
-    - cancelation_cause
     - user_id_cancel
     - user_name_cancel
     properties:
@@ -914,7 +1111,7 @@ definitions:
     - applyer_email
     - applyer_id
     - applyer_name
-    - appointment_time
+    - appointment_start_time
     - calendar_id
     - subject
     properties:
@@ -927,7 +1124,7 @@ definitions:
       applyer_name:
         type: string
         description: Nombre del solicitante de la cita
-      appointment_time:
+      appointment_start_time:
         type: string
         description: Horario de la cita (AAAA-MM-DD HH:NN)
       calendar_id:
@@ -968,12 +1165,11 @@ definitions:
   InputCalendar:
     type: object
     required:
-    - appkey
     - concurrency
-    - domain
     - ignore_non_working_days
     - is_group
     - name
+    - owner_email
     - owner_id
     - owner_name
     - schedule
@@ -981,16 +1177,10 @@ definitions:
     - time_cancel_appointment
     - time_confirm_appointment
     properties:
-      appkey:
-        type: string
-        description: App key
       concurrency:
         type: integer
         format: int32
         description: Cantidad de citas que se pueden agendar en la misma hora
-      domain:
-        type: string
-        description: Dominios de una App
       ignore_non_working_days:
         type: integer
         format: int32
@@ -1004,6 +1194,9 @@ definitions:
       name:
         type: string
         description: Nombre de la agenda
+      owner_email:
+        type: string
+        description: Email del propietario de la agenda
       owner_id:
         type: string
         description: ID del propietario de la agenda
@@ -1048,20 +1241,12 @@ definitions:
   InputDayOff:
     type: object
     required:
-    - appkey
     - date_dayoff
-    - domain
     - name
     properties:
-      appkey:
-        type: string
-        description: App key
       date_dayoff:
         type: string
         description: Fecha del día no laboral (AAAA-MM-DD)
-      domain:
-        type: string
-        description: Dominio de la App
       name:
         type: string
         description: Nombre del día no laboral
@@ -1106,6 +1291,16 @@ definitions:
         type: integer
         format: int32
         description: Total de registros
+      response:
+        "$ref": "#/definitions/GenericResponse"
+  OutputCreateAppointment:
+    type: object
+    required:
+    - appointment
+    - response
+    properties:
+      appointment:
+        "$ref": "#/definitions/CreateAppointment"
       response:
         "$ref": "#/definitions/GenericResponse"
   OutputCreateCalendar:

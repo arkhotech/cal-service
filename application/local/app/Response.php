@@ -102,10 +102,11 @@ class Response {
      * 
      * @param int $code
      * @param int $internalCode
+     * @param string $customMessage
      * @param mixed Exception/null e
      * @return Illuminate/Http/Response
      */
-    public static function error($code, $internalCode, $e = null)
+    public static function error($code, $internalCode, $customMessage = '', $e = null)
     {        
         if ($code === 500) {
             if ($e !== null && is_a($e, 'Exception')) {
@@ -114,11 +115,11 @@ class Response {
         }
         
         //Mis mensajes de errores personalizados
-        if ($internalCode > 1000) {            
+        if ($internalCode >= 1000) {            
             $resp = response([
                 'response' => array(
                     'code' => $internalCode,
-                    'message' => self::getCustomMessage($internalCode)
+                    'message' => !empty($customMessage) ? $customMessage : self::getCustomMessage($internalCode)
                 )], $code
             );
         } else {
@@ -126,7 +127,7 @@ class Response {
             $resp = response([
                 'response' => array(
                     'code' => $code,
-                    'message' => self::getStatusCode($code)
+                    'message' => !empty($customMessage) ? $customMessage :  self::getStatusCode($code)
                 )], $code
             );
         }
@@ -212,8 +213,10 @@ class Response {
     {
 		$codes = array(
             //Generic
+            1000 => 'headers params appkey and/or domain do not exist',
             1020 => 'Missing params request or malformed',
             1030 => 'Appkey or domain do not exist',
+            
             
             //Calendar
             1010 => 'No calendar found',            
@@ -224,7 +227,17 @@ class Response {
             //DayOff
             1070 => 'No dayoff found',
 			1080 => 'There are available appointments in this date',
-            1090 => 'Date must be greater or equal to current date'
+            1090 => 'Date must be greater or equal to current date',
+            
+            //Appointment
+            2010 => 'Start date must be greater or equal to current date',
+            2020 => 'Appointment time is in non working day',
+            2030 => 'Appointment time is in schedule blocked',
+            2040 => 'Appointment time is not into calendar schedule',
+            2050 => 'Appointment is overlapping with another',
+            2060 => 'Can not cancel appointment because of time to cancel',
+            2070 => 'No appointment found'
+             
         );
         
 		$result = (isset($codes[$code])) ? $codes[$code] : 'Unknown Status Code';

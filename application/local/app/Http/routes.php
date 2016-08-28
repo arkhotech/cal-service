@@ -25,4 +25,14 @@ Route::group(array('prefix' => 'v1'), function() {
     Route::get('daysOff', 'DayOffController@index');
     Route::post('daysOff', 'DayOffController@store');
     Route::delete('daysOff/{id}', 'DayOffController@destroy');
+    
+    //Appointment    
+    Route::post('appointments/reserve', 'AppointmentController@store');
+    Route::put('appointments/{id}', 'AppointmentController@update');
+    Route::put('appointments/confirm/{id}', 'AppointmentController@confirm');
+    Route::put('appointments/cancel/{id}', 'AppointmentController@cancel');
+    Route::put('appointments/assists/{id}', 'AppointmentController@assists');
+    Route::get('appointments/listByApplyer/{id}', 'AppointmentController@listByApplyer');
+    Route::get('appointments/listByOwner/{id}', 'AppointmentController@listByOwner');
+    
 });

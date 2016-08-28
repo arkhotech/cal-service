@@ -12,6 +12,7 @@ use App\DayOff;
 use App\Repositories\CalendarRepository;
 use App\App;
 use DB;
+use Log;
 use Illuminate\Support\Facades\Cache;
 use \Illuminate\Database\QueryException;
 
@@ -31,11 +32,17 @@ class DayOffRepository
         
         try {            
             $ttl = (int)config('calendar.cache_ttl');
-            $cache_id = sha1('cacheDayOffList_'.$appkey.'_'.$domain.'_'.$ano);
-            
-            $res = Cache::remember($cache_id, $ttl, function() use($appkey, $domain, $ano) {
-                
-                $daysoff = DayOff::where('appkey', $appkey)
+            $cache_id = sha1('cacheDayOffList_'.$appkey.'_'.$domain.'_'.$ano);            
+            $res = Cache::get($cache_id);
+                    
+            if ($res === null) {                
+                $columns = array(
+                    'id',
+                    'name',
+                    DB::raw('DATE_FORMAT(date_dayoff, "%Y-%m-%dT%TZ") as date_dayoff'),
+                );
+                $daysoff = DayOff::select($columns)
+                        ->where('appkey', $appkey)
                         ->where('domain', $domain)
                         ->where(DB::raw('YEAR(date_dayoff)'), $ano)->get();
                 
@@ -43,8 +50,9 @@ class DayOffRepository
                 $res['count'] = $daysoff->count();                
                 $res['error'] = null;
                 
-                return $res;
-            });
+                $tag = sha1($appkey.'_'.$domain);
+                Cache::tags([$tag])->put($cache_id, $res, $ttl);
+            }
         } catch (QueryException $qe) {
             $res['error'] = $qe;
         } catch (Exception $e) {
@@ -55,12 +63,59 @@ class DayOffRepository
     }
     
     /**
+     * Retorna true si la fecha enviada se encuentra registrada en DB
+     * 
+     * @param string $appkey
+     * @param string $domain
+     * @param date $start_date
+     * @param date $end_date
+     * @return boolean
+     */
+    public function isDayOff($appkey, $domain, $start_date, $end_date)
+    {
+        $res = true;
+        
+        try {
+            $start_date = new \DateTime($start_date);
+            $start_date = $start_date->format('Y-m-d');
+            $end_date = new \DateTime($end_date);
+            $end_date = $end_date->format('Y-m-d');
+            
+            if ($appkey && $domain && $start_date && $end_date) {
+                $ttl = (int)config('calendar.cache_ttl');
+                $cache_id = sha1('cacheIsDayOff_'.$appkey.'_'.$domain.'_'.$start_date.'_'.$end_date);                
+                $res = Cache::get($cache_id);
+                
+                if ($res === null) {
+                    $daysoff = DayOff::where('appkey', $appkey)
+                            ->where('domain', $domain)
+                            ->where('date_dayoff', '>=', $start_date)
+                            ->where('date_dayoff', '<=', $end_date)->get();
+                    
+                    $res = $daysoff->count() ? true : false;
+                    
+                    $tag = sha1($appkey.'_'.$domain);
+                    Cache::tags([$tag])->put($cache_id, $res, $ttl);
+                }
+            }
+        } catch (QueryException $qe) {
+            Log::error('code: ' .  $qe->getCode() . ' Message: ' . $qe->getMessage());
+        } catch (Exception $e) {
+            Log::error('code: ' .  $e->getCode() . ' Message: ' . $e->getMessage());
+        }        
+        
+        return $res;
+    }
+    
+    /**
      * Crea un nuevo registro de tipo dayOff
      * 
-     * @param array $data
+     * @param string $appkey
+     * @param string $domain
+     * @param array $data     
      * @return Collection
      */
-    public function createDayOff($data)
+    public function createDayOff($appkey, $domain, $data)
     {
         $res = array();
         
@@ -74,12 +129,12 @@ class DayOffRepository
                 
                 if ($data['date_dayoff'] >= date('Y-m-d')) {
                     //Verifico que no hayan citas programadas para ese dia
-                    if (!$cal->hasAvailableAppointmentByDate($data['appkey'], 
-                            $data['domain'], $data['date_dayoff'])) {
+                    if (!$cal->hasAvailableAppointmentByDate($appkey, $domain, $data['date_dayoff'])) {
                         $dayoff = DayOff::create($data);
                         $res['error'] = null;
 
-                        Cache::flush();
+                        $tag = sha1($appkey.'_'.$domain);
+                        Cache::tags($tag)->flush();
                     } else {
                         $res['error'] = new \Exception('', 1080);
                     }
@@ -105,10 +160,12 @@ class DayOffRepository
     /**
      * Elimina un registro de tipo dayOff
      *      
-     * @param int $id
+     * @param string $appkey
+     * @param string $domain
+     * @param int $id     
      * @return Collection
      */
-    public function destroyDayOff($id)
+    public function destroyDayOff($appkey, $domain, $id)
     {
         $res = array();
         
@@ -116,7 +173,8 @@ class DayOffRepository
             $dayoff = DayOff::destroy($id);
             $res['error'] = $dayoff === false ? new \Exception('', 500) : null;
             
-            Cache::flush();
+            $tag = sha1($appkey.'_'.$domain);
+            Cache::tags($tag)->flush();
         } catch (QueryException $qe) {            
                 $res['error'] = $qe;
         } catch (Exception $e) {
@@ -124,49 +182,5 @@ class DayOffRepository
         }
         
         return $res;
-    }
-    
-    public function sanitizeString($string)
-    {
-
-        $string = trim($string);
-
-        $string = str_replace(
-            array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),
-            array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),
-            $string
-        );
-
-        $string = str_replace(
-            array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'),
-            array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'),
-            $string
-        );
-
-        $string = str_replace(
-            array('í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î'),
-            array('i', 'i', 'i', 'i', 'I', 'I', 'I', 'I'),
-            $string
-        );
-
-        $string = str_replace(
-            array('ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô'),
-            array('o', 'o', 'o', 'o', 'O', 'O', 'O', 'O'),
-            $string
-        );
-
-        $string = str_replace(
-            array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'),
-            array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'),
-            $string
-        );
-
-        $string = str_replace(
-            array('ñ', 'Ñ', 'ç', 'Ç'),
-            array('n', 'N', 'c', 'C',),
-            $string
-        );
-
-        return $string;
     }
 }

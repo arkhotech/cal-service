@@ -25,7 +25,7 @@ class BlockScheduleController extends Controller
     /**
      * Crea una nueva instancia Controller
      *
-     * @param BlockScheduleRepository  $blockSchedule
+     * @param BlockScheduleRepository $blockSchedule
      * @return void
      */
     public function __construct(BlockScheduleRepository $blockSchedules)

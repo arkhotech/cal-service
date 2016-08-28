@@ -3253,5 +3253,56 @@
         ],
         "description": "Symfony DomCrawler Component",
         "homepage": "https://symfony.com"
+    },
+    {
+        "name": "intervention/validation",
+        "version": "1.1.4",
+        "version_normalized": "1.1.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Intervention/validation.git",
+            "reference": "c0d6f618dfb96ee36b65bf477e282ee2f51255b9"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Intervention/validation/zipball/c0d6f618dfb96ee36b65bf477e282ee2f51255b9",
+            "reference": "c0d6f618dfb96ee36b65bf477e282ee2f51255b9",
+            "shasum": ""
+        },
+        "require": {
+            "illuminate/support": "~4|~5",
+            "illuminate/validation": "~4|~5",
+            "php": ">=5.3.0"
+        },
+        "time": "2016-05-21 13:40:49",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Intervention\\Validation\\": "src/Intervention/Validation"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Oliver Vogel",
+                "email": "oliver@olivervogel.net",
+                "homepage": "http://olivervogel.net/"
+            }
+        ],
+        "description": "Additional Validator Functions for the Laravel Framework",
+        "keywords": [
+            "BIC",
+            "IBAN",
+            "ISBN",
+            "ISIN",
+            "creditcard",
+            "laravel",
+            "validation",
+            "validator"
+        ]
     }
 ]

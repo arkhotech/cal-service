@@ -22,6 +22,7 @@ class App extends Model
     
 	protected $fillable = array(
         'appkey',
+        'domain',
         'name',
         'contact_email',
         'status'

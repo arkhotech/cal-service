@@ -155,6 +155,11 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        
+        /**
+         * Third parties applications
+         */
+        'Intervention\Validation\ValidationServiceProvider'
 
     ],
 
