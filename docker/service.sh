@@ -68,8 +68,8 @@ case $1 in
 	
 	echo "Paso 1: crear base de datos"
 	docker pull $MYSQL_IMAGE 
-	docker run --name $MYSQL_NAME --hostname=mysqlserver -v $DBDIR:/var/lib/mysql -p 3306:3306 $MYSQL_IMAGE
-
+	docker run --name $MYSQL_NAME --hostname=mysqlserver -e MYSQL_ROOT_PASSWORD=aloja123 -v $DBDIR:/var/lib/mysql -p 3306:3306 $MYSQL_IMAGE
+	
 ;;
 'create-with-db')
       docker run -i -d -t --name $NAME \
