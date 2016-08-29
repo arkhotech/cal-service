@@ -236,7 +236,11 @@ class Response {
             2040 => 'Appointment time is not into calendar schedule',
             2050 => 'Appointment is overlapping with another',
             2060 => 'Can not cancel appointment because of time to cancel',
-            2070 => 'No appointment found'
+            2070 => 'No appointment found',
+            
+            //BlockSchedule
+            2080 => 'End date must be greater than start date',
+            2090 => 'Start date must be greater or equal to current date',
              
         );
         

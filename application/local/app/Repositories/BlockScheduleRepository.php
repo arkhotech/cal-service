@@ -9,9 +9,8 @@
 namespace App\Repositories;
 
 use Log;
-use DB;
 use App\BlockSchedule;
-use App\App;
+use App\Calendar;
 use Illuminate\Support\Facades\Cache;
 use \Illuminate\Database\QueryException;
 
@@ -20,10 +19,52 @@ class BlockScheduleRepository
     public function listBlockSchedule()
     {
     }
-
-    public function createBlockSchedule()
+    
+    /**
+     * Crea un nuevo registro de tipo block schedule
+     * 
+     * @param string $appkey
+     * @param string $domain
+     * @param array $data     
+     * @return Collection
+     */
+    public function createBlockSchedule($appkey, $domain, $data)
     {
+        $res = array();
         
+        try {            
+            $calendar = Calendar::where('id', $data['calendar_id'])->get();
+            
+            if ($calendar->count() > 0) {
+                $start_date = new \DateTime($data['start_date']);
+                $start_date = $start_date->format('Y-m-d H:i:s');
+                $end_date = new \DateTime($data['end_date']);
+                $end_date = $end_date->format('Y-m-d H:i:s');
+                
+                if ($start_date >= date('Y-m-d H:i:s')) {
+                    if ($end_date > $start_date) {
+                        $data['created_date'] = date('Y-m-d H:i:s');
+                        BlockSchedule::create($data);
+                        $res['error'] = null;
+
+                        $tag = sha1($appkey.'_'.$domain);
+                        Cache::tags($tag)->flush();                    
+                    } else {
+                        $res['error'] = new \Exception('', 2080);
+                    }
+                } else {
+                    $res['error'] = new \Exception('', 2090);
+                }
+            } else {
+                $res['error'] = new \Exception('', 1010);
+            }
+        } catch (QueryException $qe) {
+            $res['error'] = $qe;
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }
+        
+        return $res;        
     }
     
     public function destroyBlockSchedule()
