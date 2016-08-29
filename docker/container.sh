@@ -3,6 +3,13 @@
 
 CONTAINER=$2
 
+
+function crearContainerMysql() {
+        pwd
+        ./service.sh create-mysql
+}
+
+
 if [ -z $2 ];
 then
 	echo "No se ha especificado el valor del container"
@@ -39,7 +46,3 @@ case $1 in
 	echo "Comando desconocido"
 
 esac
-
-function crearContainerMysql() {
-	phpfpm.sh create-mysql
-}

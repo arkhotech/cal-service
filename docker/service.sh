@@ -45,6 +45,8 @@ then
 	DBDIR=$('pwd')/datadir
 fi
 
+MYSQL_IMAGE=mysql:5.5
+
 #if [ $? -lt  1 ];
 #then
 #       echo "Parmetros aceptados:  comando [ create | remove | restart ]"
@@ -65,8 +67,8 @@ case $1 in
 'create-mysql')
 	
 	echo "Paso 1: crear base de datos"
-	docker pull mysql:5.5
-	docker run --name $MYSQL_NAME --hostname=mysqlserver -v $DBDIR:/var/lib/mysql -p 3306:3306 
+	docker pull $MYSQL_IMAGE 
+	docker run --name $MYSQL_NAME --hostname=mysqlserver -v $DBDIR:/var/lib/mysql -p 3306:3306 $MYSQL_IMAGE
 
 ;;
 'create-with-db')
@@ -78,7 +80,7 @@ case $1 in
 'create')
      echo "Creando un nuevo container"
      docker run -i -d -t --name $NAME \
-        --hostname agendas \
+        --hostname agendas 
         -p 9000:9000 -v $WEBROOT:$INTERNAL_PATH  $IMAGE
 ;;
 'remove')
