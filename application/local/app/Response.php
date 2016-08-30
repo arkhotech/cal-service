@@ -215,8 +215,7 @@ class Response {
             //Generic
             1000 => 'headers params appkey and/or domain do not exist',
             1020 => 'Missing params request or malformed',
-            1030 => 'Appkey or domain do not exist',
-            
+            1030 => 'Appkey or domain do not exist',            
             
             //Calendar
             1010 => 'No calendar found',            
@@ -241,7 +240,11 @@ class Response {
             //BlockSchedule
             2080 => 'End date must be greater than start date',
             2090 => 'Start date must be greater or equal to current date',
-             
+
+            //App
+            4010 => 'No app found',
+            4020 => 'App outdated, same fields',
+            4030 => 'Status unchanged, same field'
         );
         
 		$result = (isset($codes[$code])) ? $codes[$code] : 'Unknown Status Code';

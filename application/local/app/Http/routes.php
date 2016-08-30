@@ -34,8 +34,15 @@ Route::group(array('prefix' => 'v1'), function() {
     Route::put('appointments/assists/{id}', 'AppointmentController@assists');
     Route::get('appointments/listByApplyer/{id}', 'AppointmentController@listByApplyer');
     Route::get('appointments/listByOwner/{id}', 'AppointmentController@listByOwner');
+    Route::get('appointments/availability/{id}', 'AppointmentController@listAvailability');
     
     //BlockSchedule
     Route::post('blockSchedules', 'BlockScheduleController@store');
+
+    //App
+    Route::get('apps', 'AppController@index');
+    Route::post('apps', 'AppController@store');
+    Route::put('apps', 'AppController@update');
+    Route::put('apps/changeStatus', 'AppController@changeStatus');
     
 });
