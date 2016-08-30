@@ -17,6 +17,8 @@ tags:
   description: Citas en una agenda determinada
 - name: BlockSchedules
   description: Bloqueos de horarios
+- name: Application
+  description: Aplicaciones
 schemes:
 - http
 paths:
@@ -900,6 +902,151 @@ paths:
           description: Error 500
           schema:
             "$ref": "#/definitions/ErrorResponse"
+  "/apps":
+    get:
+      tags:
+      - Application
+      description: Lista las aplicaciones
+      operationId: getApplications
+      consumes: []
+      produces:
+      - application/json
+      parameters:
+      - name: appkey
+        in: query
+        description: App key
+        required: false
+        type: string
+      - name: domain
+        in: query
+        description: Dominios de una App
+        required: false
+        type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            "$ref": "#/definitions/OutputApplications"
+        '400':
+          description: Error 400
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '404':
+          description: Error 404
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '500':
+          description: Error 500
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+    post:
+      tags:
+      - Application
+      description: Crea aplicaciones
+      operationId: postApplications
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        required: false
+        schema:
+          "$ref": "#/definitions/InputCreateApplication"
+      responses:
+        '201':
+          description: Success
+          schema:
+            "$ref": "#/definitions/SuccessResponse"
+        '400':
+          description: Error 400
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '500':
+          description: Error 500
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+    put:
+      tags:
+      - Application
+      summary: UpdateApplication
+      description: Actualiza una App
+      operationId: putApplication
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: appkey
+        in: query
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: query
+        description: Domain de la App
+        required: true
+        type: string
+      - in: body
+        name: body
+        required: false
+        schema:
+          "$ref": "#/definitions/InputUpdateApplication"
+      responses:
+        '200':
+          description: Success
+          schema:
+            "$ref": "#/definitions/SuccessResponse"
+        '400':
+          description: Error 400
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '500':
+          description: Error 500
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+  "/apps/changeStatus":
+    put:
+      tags:
+      - Application
+      summary: ChangeStatusApplication
+      description: Cambia el estado una App
+      operationId: putChangeApplication
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: appkey
+        in: query
+        description: App key
+        required: true
+        type: string
+      - name: domain
+        in: query
+        description: Domain de la App
+        required: true
+        type: string
+      - in: body
+        name: body
+        required: false
+        schema:
+          "$ref": "#/definitions/InputChangeApplication"
+      responses:
+        '200':
+          description: Success
+          schema:
+            "$ref": "#/definitions/SuccessResponse"
+        '400':
+          description: Error 400
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+        '500':
+          description: Error 500
+          schema:
+            "$ref": "#/definitions/ErrorResponse"
+
 definitions:
   Appointment:
     type: object
@@ -1061,6 +1208,38 @@ definitions:
       name:
         type: string
         description: Nombre del día no laboral
+  Application:
+    type: object
+    required:
+    - appkey
+    - domain
+    - name
+    - contact_email
+    - from_email
+    - from_name
+    - status
+    properties:
+      appkey:
+        type: string
+        description: App key
+      domain:
+        type: string
+        description: Dominio de la App
+      name:
+        type: string
+        description: Nombre de la App
+      contact_email:
+        type: string
+        description: Email de contacto
+      from_email:
+        type: string
+        description: Email de notificación
+      from_name:
+        type: string
+        description: Nombre
+      status:
+        type: string
+        description: Estado de la App
   ErrorResponse:
     type: object
     required:
@@ -1250,6 +1429,59 @@ definitions:
       name:
         type: string
         description: Nombre del día no laboral
+  InputCreateApplication:
+    type: object
+    required:
+    - domain
+    - name
+    - contact_email
+    - from_email
+    - from_name
+    properties:
+      domain:
+        type: string
+        description: Dominio de la App
+      name:
+        type: string
+        description: Nombre de la App
+      contact_email:
+        type: string
+        description: Email de contacto
+      from_email:
+        type: string
+        description: Email de notificación
+      from_name:
+        type: string
+        description: Nombre
+  InputUpdateApplication:
+    type: object
+    required:
+    - name
+    - contact_email
+    - from_email
+    - from_name
+    properties:
+      name:
+        type: string
+        description: Nombre de la App
+      contact_email:
+        type: string
+        description: Email de contacto
+      from_email:
+        type: string
+        description: Email de notificación
+      from_name:
+        type: string
+        description: Nombre
+  InputChangeApplication:
+    type: object
+    required:
+    - status
+    properties:
+      status:
+        type: integer
+        format: int32
+        description: Estado de a App
   OutputAppointment:
     type: object
     required:
@@ -1324,6 +1556,18 @@ definitions:
           "$ref": "#/definitions/DayOff"
       response:
         "$ref": "#/definitions/GenericResponse"
+  OutputApplications:
+    type: object
+    required:
+    - response
+    properties:
+      application:
+        type: array
+        description: Listado de aplicaciones
+        items:
+          "$ref": "#/definitions/Application"
+      response:
+        "$ref": "#/definitions/GenericResponse"
   SuccessResponse:
     type: object
     required:
@@ -1331,4 +1575,3 @@ definitions:
     properties:
       response:
         "$ref": "#/definitions/GenericResponse"
-

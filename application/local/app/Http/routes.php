@@ -37,5 +37,11 @@ Route::group(array('prefix' => 'v1'), function() {
     
     //BlockSchedule
     Route::post('blockSchedules', 'BlockScheduleController@store');
+
+    //App
+    Route::get('apps', 'AppController@index');
+    Route::post('apps', 'AppController@store');
+    Route::put('apps', 'AppController@update');
+    Route::put('apps/changeStatus', 'AppController@changeStatus');
     
 });

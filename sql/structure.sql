@@ -57,6 +57,8 @@ CREATE TABLE `apps` (
   `domain` varchar(150) NOT NULL,
   `name` varchar(70) NOT NULL,
   `contact_email` varchar(80) NOT NULL,
+  `from_email` varchar(80) NOT NULL,
+  `from_name` varchar(80) NOT NULL,
   `status` tinyint(4) NOT NULL,
   PRIMARY KEY (`appkey`,`domain`),
   UNIQUE KEY `app_key_UNIQUE` (`appkey`,`domain`)
