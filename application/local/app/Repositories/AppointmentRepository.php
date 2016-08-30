@@ -210,8 +210,8 @@ class AppointmentRepository
                         $result[$i]['owner_name'] = $appointment->owner_name;
                         $result[$i]['applyer_name'] = $appointment->applyer_name;
                         $result[$i]['applyer_email'] = $appointment->applyer_email;
-                        $result[$i]['time'] = '';
-                        $result[$i]['available'] = '';
+                        $result[$i]['time'] = '08:00';
+                        $result[$i]['available'] = 'D';
                         $i++;
                     }
 
