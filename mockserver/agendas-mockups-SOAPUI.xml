@@ -613,6 +613,9 @@ if( requestBody.contains("some data") )
   "response":{
     "code":200,
     "message":"Ok"
+  },
+  "appointment":{
+  	"id":2
   }
 }</con:responseContent></con:response></con:restMockAction><con:restMockAction name="/v1/blockSchedules" method="POST" resourcePath="/v1/blockSchedules" id="accaf5c5-77a7-49dc-90d8-3e7d697e2f9a"><con:settings/><con:defaultResponse>Response 1</con:defaultResponse><con:dispatchStyle>SCRIPT</con:dispatchStyle><con:dispatchPath>/*
 // Script dispatcher is used to select a response based on the incoming request.
