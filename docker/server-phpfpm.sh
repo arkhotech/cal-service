@@ -39,7 +39,7 @@ case $1 in
 'remove')
 	echo "Removiendo container"
 	docker inspect $NAME 
-	if [ $? eq 0 ];
+	if [ $? == 0 ];
         then
 		docker stop $NAME 
 		docker rm $NAME
