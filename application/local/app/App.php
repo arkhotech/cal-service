@@ -25,6 +25,8 @@ class App extends Model
         'domain',
         'name',
         'contact_email',
+        'from_email',
+        'from_name',
         'status'
     );
 }

@@ -1626,4 +1626,3 @@ definitions:
     properties:
       response:
         "$ref": "#/definitions/GenericResponse"
-

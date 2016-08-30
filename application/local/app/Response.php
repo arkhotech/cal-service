@@ -86,12 +86,13 @@ class Response {
             array_push($c, $data);        
             $resp = response($c, $code);
         } else {
-            $resp = response([
+            $c[] = array(
                 'response' => array(
                     'code' => $code,
                     'message' => self::getStatusCode($code)
-                )], $code
+                )
             );
+            $resp = response($c, $code);
         }
         
         return $resp;
@@ -115,21 +116,23 @@ class Response {
         }
         
         //Mis mensajes de errores personalizados
-        if ($internalCode >= 1000) {            
-            $resp = response([
+        if ($internalCode >= 1000) {
+            $c[] = array(
                 'response' => array(
                     'code' => $internalCode,
                     'message' => !empty($customMessage) ? $customMessage : self::getCustomMessage($internalCode)
-                )], $code
+                )
             );
+            $resp = response($c, $code);
         } else {
             //Errores estandar
-            $resp = response([
+            $c[] = array(
                 'response' => array(
                     'code' => $code,
                     'message' => !empty($customMessage) ? $customMessage :  self::getStatusCode($code)
-                )], $code
+                )
             );
+            $resp = response($c, $code);
         }
         
         return $resp;
