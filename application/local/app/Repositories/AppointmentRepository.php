@@ -159,6 +159,81 @@ class AppointmentRepository
     }
     
     /**
+     * Obtiene todas las citas y su disponibilidad
+     * 
+     * @param string $appkey
+     * @param string $domain
+     * @param int $calendar_id
+     * @return Collection
+     */
+    public function listAppointmentsAvailability($appkey, $domain, $calendar_id)
+    {
+        $res = array();
+        
+        try {            
+            $ttl = (int)config('calendar.cache_ttl');
+            $month_max_availability = (int)config('calendar.month_max_appointments');
+            $cache_id = sha1('cacheAppointmentListAvailability_'.$calendar_id);
+            $res = Cache::get($cache_id);
+            
+            if ($res === null) {
+                if ((int)$calendar_id > 0) {
+                    $columns = array(
+                        DB::raw('appointments.id as appointment_id'),
+                        'subject',
+                        'applyer_name',
+                        'owner_name',
+                        'applyer_email',
+                        DB::raw('"" AS time'),
+                        DB::raw('"" AS available'),
+                        DB::raw('DATE_FORMAT(appointment_start_time, "%Y-%m-%dT%TZ") AS appointment_time')
+                    );                   
+                    
+                    $months = new \DateTime(date('Y-m-d H:i:s'));
+                    $interval = new \DateInterval('P'.$month_max_availability.'M');
+                    $date = $months->add($interval)->format('Y-m-d H:i:s');
+
+                    $appointments = Appointment::select($columns)
+                            ->join('calendars', 'calendars.id', '=', 'appointments.calendar_id')
+                            ->where('calendar_id', $calendar_id)
+                            ->where(DB::raw('DATE(appointment_start_time)'), '<=', date('Y-m-d'))
+                            ->where('appointment_start_time', '<=', $date)
+                            ->where('is_canceled', '<>', 1)                            
+                            ->where('is_reserved', 0)->get();
+                    
+                    $result = array();
+                    $i = 0;
+                    foreach ($appointments as $appointment) {
+                        $result[$i]['appointment_id'] = $appointment->appointment_id;
+                        $result[$i]['subject'] = $appointment->subject;
+                        $result[$i]['appointment_time'] = $appointment->appointment_time;
+                        $result[$i]['owner_name'] = $appointment->owner_name;
+                        $result[$i]['applyer_name'] = $appointment->applyer_name;
+                        $result[$i]['applyer_email'] = $appointment->applyer_email;
+                        $result[$i]['time'] = '08:00';
+                        $result[$i]['available'] = 'D';
+                        $i++;
+                    }
+
+                    $res['data'] = $result;
+                    $res['count'] = $appointments->count();
+                    $res['error'] = null;
+                    
+                    $tag = sha1($appkey.'_'.$domain);
+                    Cache::tags([$tag])->put($cache_id, $res, $ttl);
+                }
+            }                
+            
+        } catch (QueryException $qe) {
+            $res['error'] = $qe;
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }        
+        
+        return $res;
+    }
+    
+    /**
      * Crea un nuevo registro de tipo cita
      *
      * @param string $appkey

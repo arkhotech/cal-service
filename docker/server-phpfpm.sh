@@ -38,8 +38,14 @@ case $1 in
 ;;
 'remove')
 	echo "Removiendo container"
-	docker stop $NAME 
-	docker rm $NAME 
+	docker inspect $NAME 
+	if [ $? == 0 ];
+        then
+		docker stop $NAME 
+		docker rm $NAME
+	else
+		echo "No existe el contenedor"
+	fi 
 ;;
 'restart')
 	docker exec -i -t $NAME  php-fpm restart
