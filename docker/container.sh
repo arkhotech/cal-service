@@ -21,7 +21,6 @@ fi
 if [ $? -eq 1 ];
 then
 	echo "Ccontenedor $CONTAINER no existe"
-	exit 0
 	crearContainerMysql
 fi
 
