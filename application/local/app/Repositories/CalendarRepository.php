@@ -33,7 +33,8 @@ class CalendarRepository
         try {            
             $ttl = (int)config('calendar.cache_ttl');
             $cache_id = sha1('cacheCalendarList_'.$appkey.'_'.$domain.'_'.$page);
-            $res = Cache::get($cache_id);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
             
             if ($res === null) {
                 if ($page !== 0) {                    
@@ -76,8 +77,7 @@ class CalendarRepository
                     $i++;
                 }
 
-                $res['data'] = $cal_array;
-                $tag = sha1($appkey.'_'.$domain);
+                $res['data'] = $cal_array;                
                 Cache::tags([$tag])->put($cache_id, $res, $ttl);
             }                
             
@@ -106,7 +106,8 @@ class CalendarRepository
             $text = trim(strtolower($text));
             $ttl = (int)config('calendar.cache_ttl');
             $cache_id = sha1('cacheCalendarSearchByName_'.$appkey.'_'.$domain.'_'.$this->sanitizeString($text));
-            $res = Cache::get($cache_id);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
             
             if ($res === null) {
                 if (!empty($text)) {                    
@@ -141,9 +142,8 @@ class CalendarRepository
 
                     $res['data'] = $cal_array;                    
                     $res['count'] = $calendars->count();
-                    $res['error'] = null;
+                    $res['error'] = null;                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
                 }
             }
@@ -171,7 +171,8 @@ class CalendarRepository
         try {            
             $ttl = (int)config('calendar.cache_ttl');
             $cache_id = sha1('cacheCalendarListById_'.$id);
-            $res = Cache::get($cache_id);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
             
             if ($res === null) {
                 if ((int)$id > 0) {
@@ -199,9 +200,8 @@ class CalendarRepository
 
                     $res['data'] = $cal_array;
                     $res['count'] = 1;
-                    $res['error'] = null;
+                    $res['error'] = null;                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
                 }
             }
@@ -342,7 +342,8 @@ class CalendarRepository
             if ((int)$id > 0) {
                 $ttl = (int)config('calendar.cache_ttl');
                 $cache_id = sha1('cacheCalendarAppointment_'.$id);
-                $resp = Cache::get($cache_id);
+                $tag = sha1($appkey.'_'.$domain);
+                $resp = Cache::tags($tag)->get($cache_id);
                 
                 if ($resp === null) {
                     $results = Calendar::find($id)
@@ -350,9 +351,8 @@ class CalendarRepository
                             ->where('is_canceled', '<>', 1)
                             ->where('appointment_start_time', '>=', date('Y-m-d H:i:s'))->get();
                     
-                    $resp = $results->count() ? true : false;
+                    $resp = $results->count() ? true : false;                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $resp, $ttl);
                 }
             }
@@ -379,7 +379,8 @@ class CalendarRepository
             if (!empty($appkey) && !empty($domain) && !empty($date)) {
                 $ttl = (int)config('calendar.cache_ttl');
                 $cache_id = sha1('cacheCalendarAppointmentByDate_'.$appkey.'_'.$domain.'_'.$date);
-                $resp = Cache::get($cache_id);
+                $tag = sha1($appkey.'_'.$domain);
+                $resp = Cache::tags($tag)->get($cache_id);
                 
                 if ($resp === null) {
                     $results = Calendar::join('appointments', 'calendars.id', '=', 'appointments.calendar_id')
@@ -390,9 +391,8 @@ class CalendarRepository
                         ->where(DB::raw('DATE(appointment_start_time)'), $date)
                         ->get();
                     
-                    $resp = $results->count() ? true : false;
+                    $resp = $results->count() ? true : false;                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $resp, $ttl);
                 }
             }

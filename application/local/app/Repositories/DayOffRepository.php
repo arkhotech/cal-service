@@ -33,7 +33,8 @@ class DayOffRepository
         try {            
             $ttl = (int)config('calendar.cache_ttl');
             $cache_id = sha1('cacheDayOffList_'.$appkey.'_'.$domain.'_'.$ano);            
-            $res = Cache::get($cache_id);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
                     
             if ($res === null) {                
                 $columns = array(
@@ -48,9 +49,8 @@ class DayOffRepository
                 
                 $res['data'] = $daysoff;
                 $res['count'] = $daysoff->count();                
-                $res['error'] = null;
+                $res['error'] = null;                
                 
-                $tag = sha1($appkey.'_'.$domain);
                 Cache::tags([$tag])->put($cache_id, $res, $ttl);
             }
         } catch (QueryException $qe) {
@@ -84,7 +84,8 @@ class DayOffRepository
             if ($appkey && $domain && $start_date && $end_date) {
                 $ttl = (int)config('calendar.cache_ttl');
                 $cache_id = sha1('cacheIsDayOff_'.$appkey.'_'.$domain.'_'.$start_date.'_'.$end_date);                
-                $res = Cache::get($cache_id);
+                $tag = sha1($appkey.'_'.$domain);
+                $res = Cache::tags($tag)->get($cache_id);
                 
                 if ($res === null) {
                     $daysoff = DayOff::where('appkey', $appkey)
@@ -92,9 +93,8 @@ class DayOffRepository
                             ->where('date_dayoff', '>=', $start_date)
                             ->where('date_dayoff', '<=', $end_date)->get();
                     
-                    $res = $daysoff->count() ? true : false;
+                    $res = $daysoff->count() ? true : false;                   
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
                 }
             }
