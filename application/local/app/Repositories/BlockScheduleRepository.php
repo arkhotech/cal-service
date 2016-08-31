@@ -95,7 +95,8 @@ class BlockScheduleRepository
             
                 $ttl = (int)config('calendar.cache_ttl');
                 $cache_id = sha1('cacheIsScheduleBlock_'.$calendar_id.'_'.$start_date.'_'.$end_date);
-                $res = Cache::get($calendar_id);
+                $tag = sha1($appkey.'_'.$domain);
+                $res = Cache::tags($tag)->get($cache_id);
                 
                 if ($res === null) {
                     $blocks = BlockSchedule::where('end_date', '>=', date('Y-m-d H:i:s'))
@@ -103,9 +104,8 @@ class BlockScheduleRepository
                           ->Where('end_date', '>=', $start_date)                          
                           ->where('calendar_id', $calendar_id)->get();
                     
-                    $res = $blocks->count() ? true : false;
+                    $res = $blocks->count() ? true : false;                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
                 }
             }

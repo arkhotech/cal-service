@@ -35,7 +35,8 @@ class AppointmentRepository
         try {            
             $ttl = (int)config('calendar.cache_ttl');
             $cache_id = sha1('cacheAppointmentListByApplyer_'.$appkey.'_'.$domain.'_'.$id.'_'.$page);
-            $res = Cache::get($cache_id);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
             
             if ($res === null) {
                 if ((int)$id > 0) {
@@ -72,9 +73,8 @@ class AppointmentRepository
                         $res['data'] = $appointments;
                         $res['count'] = $appointments->count();
                     }
-                    $res['error'] = null;
+                    $res['error'] = null;                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
                 }
             }                
@@ -105,7 +105,8 @@ class AppointmentRepository
         try {            
             $ttl = (int)config('calendar.cache_ttl');
             $cache_id = sha1('cacheAppointmentListByOwner_'.$appkey.'_'.$domain.'_'.$id.'_'.$page);
-            $res = Cache::get($cache_id);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
             
             if ($res === null) {
                 if ((int)$id > 0) {
@@ -142,9 +143,8 @@ class AppointmentRepository
                         $res['data'] = $appointments;
                         $res['count'] = $appointments->count();
                     }
-                    $res['error'] = null;
+                    $res['error'] = null;                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
                 }
             }                
@@ -174,7 +174,8 @@ class AppointmentRepository
             $ttl = (int)config('calendar.cache_ttl');
             $month_max_availability = (int)config('calendar.month_max_appointments');
             $cache_id = sha1('cacheAppointmentListAvailability_'.$calendar_id);
-            $res = Cache::get($cache_id);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
             
             if ($res === null) {
                 if ((int)$calendar_id > 0) {
@@ -217,9 +218,8 @@ class AppointmentRepository
 
                     $res['data'] = $result;
                     $res['count'] = $appointments->count();
-                    $res['error'] = null;
+                    $res['error'] = null;                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
                 }
             }                
@@ -346,7 +346,8 @@ class AppointmentRepository
         try {            
             $ttl = (int)config('calendar.cache_ttl');
             $cache_id = sha1('cacheAppointmentListById_'.$id);
-            $res = Cache::get($cache_id);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
             
             if ($res === null) {
                 if ((int)$id > 0) {
@@ -354,9 +355,8 @@ class AppointmentRepository
 
                     $res['data'] = $appointments;
                     $res['count'] = $appointments->count();
-                    $res['error'] = null;
+                    $res['error'] = null;                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
                 }
             }
@@ -384,7 +384,8 @@ class AppointmentRepository
         try {            
             $ttl = (int)config('calendar.cache_ttl');
             $cache_id = sha1('cacheCalendarByAppointmentId_'.$id);
-            $res = Cache::get($cache_id);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
             
             if ($res === null) {
                 if ((int)$id > 0) {
@@ -394,9 +395,8 @@ class AppointmentRepository
 
                     $res['data'] = $appointments;
                     $res['count'] = $appointments->count();
-                    $res['error'] = null;
+                    $res['error'] = null;                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
                 }
             }
@@ -626,7 +626,8 @@ class AppointmentRepository
             
                 $ttl = (int)config('calendar.cache_ttl');
                 $cache_id = sha1('cacheIsOverlappingAppointment_'.$id.'_'.$calendar_id.'_'.$concurrency.'_'.$start_date.'_'.$end_date);
-                $res = Cache::get($cache_id);
+                $tag = sha1($appkey.'_'.$domain);
+                $res = Cache::tags($tag)->get($cache_id);
                 
                 if ($res === null) {
                     if ((int)$id > 0) {
@@ -657,9 +658,8 @@ class AppointmentRepository
                         } else {
                             $res = true;
                         }
-                    }
+                    }                    
                     
-                    $tag = sha1($appkey.'_'.$domain);
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
                 }
             }
