@@ -443,7 +443,7 @@ paths:
           description: Error 500
           schema:
             "$ref": "#/definitions/ErrorResponse"
-  "/blockSchedules":
+  "/blockSchedules/listByCalendarId/{calendar_id}":
     get:
       tags:
       - BlockSchedules
@@ -451,6 +451,12 @@ paths:
       consumes: []
       produces: []
       parameters:
+      - name: calendar_id
+        in: path
+        description: ID del calendario
+        required: true
+        type: integer
+        format: int32
       - name: appkey
         in: header
         description: App key
@@ -464,6 +470,7 @@ paths:
       responses:
         '200':
           description: OK
+  "/blockSchedules":
     post:
       tags:
       - BlockSchedules
