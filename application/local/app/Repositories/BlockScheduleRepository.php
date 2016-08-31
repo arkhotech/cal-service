@@ -16,8 +16,46 @@ use \Illuminate\Database\QueryException;
 
 class BlockScheduleRepository
 {
-    public function listBlockSchedule()
+    /**
+     * Lista todos los blockschedules
+     * 
+     * @param string $appkey
+     * @param string $domain
+     * @return Collection
+     */
+    public function listBlockSchedule($appkey, $domain)
     {
+      $res = array();
+
+        try {
+
+            $ttl = (int)config('calendar.cache_ttl');
+            $cache_id = sha1('cacheBlockScheduleList_'.$appkey.'_'.$domain);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
+                    
+            if ($res === null) {
+                
+                if (!empty($appkey) && !empty($domain)) {
+                    $blockSchedule = BlockSchedule::where('appkey', $appkey)
+                        ->where('domain', $domain)->get();
+                } else {
+                    $blockSchedule = BlockSchedule::all();
+                }
+                
+                $res['data'] = $blockSchedule;
+                $res['count'] = $blockSchedule->count();                
+                $res['error'] = null;
+
+                Cache::tags([$tag])->put($cache_id, $res, $ttl);
+            }
+        } catch (QueryException $qe) {
+            $res['error'] = $qe;
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }        
+        
+        return $res;
     }
     
     /**

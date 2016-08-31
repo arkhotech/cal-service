@@ -32,6 +32,39 @@ class BlockScheduleController extends Controller
     {
         $this->blockSchedules = $blockSchedules;
     }
+
+    /**
+     * Controller que despliega listado de blockschedules
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {  
+        $appkey = $request->header('appkey');
+        $domain = $request->header('domain');
+        $resp = array();
+        
+        if (!empty($appkey) && !empty($domain)) {
+            $blockschedule = $this->blockSchedules->listBlockSchedule($appkey, $domain);
+            
+            if (isset($blockschedule['error']) && is_a($blockschedule['error'], 'Exception')) {
+                $resp = Resp::error(500, $blockschedule['error']->getCode(), '', $blockschedule['error']);
+            } else {
+                if (count($blockschedule['data']) > 0) {
+                    $blockschedules['daysoff'] = $blockschedule['data'];
+                    $blockschedules['count'] = $blockschedule['count'];
+                    $resp = Resp::make(200, $blockschedules);
+                } else {
+                    $resp = Resp::error(404, 1070);
+                }
+            }
+        } else {
+            $resp = Resp::error(400, 1000);
+        }
+        
+        return $resp;
+    }
     
     /**
      * Crea un nuevo registro de tipo blockschedule
