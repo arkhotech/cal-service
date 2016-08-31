@@ -141,6 +141,43 @@ class CalendarController extends Controller
         
         return $resp;
     }
+
+    /**
+     * Controller que despliega los calendarios por Owner Id
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function listByOwner(Request $request, $id)
+    {
+        $resp = array();
+        $appkey = $request->header('appkey');
+        $domain = $request->header('domain');
+        
+        if (!empty($appkey) && !empty($domain)) {
+            if ((int)$id > 0) {
+                $calendars = $this->calendars->listByOwnerId($appkey, $domain, $id);
+
+                if (isset($calendars['error']) && is_a($calendars['error'], 'Exception')) {
+                    $resp = Resp::error(500, $calendars['error']->getCode(), '', $calendars['error']);
+                } else {
+                    if (count($calendars['data']) > 0) {
+                        $calendar['calendars'] = $calendars['data'];
+                        $calendar['count'] = $calendars['count'];
+                        $resp = Resp::make(200, $calendar);
+                    } else {
+                        $resp = Resp::error(404, 1010);
+                    }
+                }
+            } else {
+                $resp = Resp::error(400, 1020, 'owner_id param must be greater than zero');
+            }
+        } else {
+            $resp = Resp::error(400, 1000);
+        }
+        
+        return $resp;
+    }
     
     /**
      * Crea un nuevo registro de tipo calendario
