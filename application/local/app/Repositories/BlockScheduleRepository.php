@@ -23,22 +23,21 @@ class BlockScheduleRepository
      * @param string $domain
      * @return Collection
      */
-    public function listBlockSchedule($appkey, $domain)
+    public function listBlockScheduleByCalendarId($appkey, $domain, $id)
     {
       $res = array();
 
         try {
 
             $ttl = (int)config('calendar.cache_ttl');
-            $cache_id = sha1('cacheBlockScheduleList_'.$appkey.'_'.$domain);
+            $cache_id = sha1('cacheBlockScheduleList_'.$appkey.'_'.$domain.'_'.$id);
             $tag = sha1($appkey.'_'.$domain);
             $res = Cache::tags($tag)->get($cache_id);
                     
             if ($res === null) {
                 
                 if (!empty($appkey) && !empty($domain)) {
-                    $blockSchedule = BlockSchedule::where('appkey', $appkey)
-                        ->where('domain', $domain)->get();
+                    $blockSchedule = BlockSchedule::where('calendar_id', $id)->get();
                 } else {
                     $blockSchedule = BlockSchedule::all();
                 }
@@ -86,7 +85,7 @@ class BlockScheduleRepository
                         $res['error'] = null;
 
                         $tag = sha1($appkey.'_'.$domain);
-                        Cache::tags($tag)->flush();                    
+                        Cache::tags($tag)->flush();
                     } else {
                         $res['error'] = new \Exception('', 2080);
                     }
@@ -105,9 +104,33 @@ class BlockScheduleRepository
         return $res;        
     }
     
-    public function destroyBlockSchedule()
+    /**
+     * Elimina un registro de tipo BlockSchedule
+     * 
+     * @param string $appkey
+     * @param string $domain
+     * @param int $calendar_id
+     * @param date $start_date
+     * @param date $end_date     
+     * @return bool
+     */
+    public function destroyBlockSchedule($appkey, $domain, $id)
     {
+        $res = array();
         
+        try {
+            $blockSchedule = BlockSchedule::destroy($id);
+            $res['error'] = $blockSchedule === false ? new \Exception('', 500) : null;
+            
+            $tag = sha1($appkey.'_'.$domain);
+            Cache::tags($tag)->flush();
+        } catch (QueryException $qe) {            
+                $res['error'] = $qe;
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }
+        
+        return $res;
     }
     
     /**

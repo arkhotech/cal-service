@@ -39,24 +39,28 @@ class BlockScheduleController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $id)
     {  
         $appkey = $request->header('appkey');
         $domain = $request->header('domain');
         $resp = array();
         
-        if (!empty($appkey) && !empty($domain)) {
-            $blockschedule = $this->blockSchedules->listBlockSchedule($appkey, $domain);
-            
-            if (isset($blockschedule['error']) && is_a($blockschedule['error'], 'Exception')) {
-                $resp = Resp::error(500, $blockschedule['error']->getCode(), '', $blockschedule['error']);
+        if (!empty($appkey) && !empty($domain)) {            
+            if ((int)$id <= 0) {
+                $resp = Resp::error(400, 1020);            
             } else {
-                if (count($blockschedule['data']) > 0) {
-                    $blockschedules['daysoff'] = $blockschedule['data'];
-                    $blockschedules['count'] = $blockschedule['count'];
-                    $resp = Resp::make(200, $blockschedules);
+                $blockschedule = $this->blockSchedules->listBlockScheduleByCalendarId($appkey, $domain, $id);
+
+                if (isset($blockschedule['error']) && is_a($blockschedule['error'], 'Exception')) {
+                    $resp = Resp::error(500, $blockschedule['error']->getCode(), '', $blockschedule['error']);
                 } else {
-                    $resp = Resp::error(404, 1070);
+                    if (count($blockschedule['data']) > 0) {
+                        $blockschedules['blockSchedules'] = $blockschedule['data'];
+                        $blockschedules['count'] = $blockschedule['count'];
+                        $resp = Resp::make(200, $blockschedules);
+                    } else {
+                        $resp = Resp::error(404, 1070);
+                    }
                 }
             }
         } else {
@@ -109,6 +113,38 @@ class BlockScheduleController extends Controller
             }
         } else {
             return Resp::error(400, 1000); 
+        }
+        
+        return $resp;
+    }
+
+    /**
+     * Elimina un registro de tipo blockschedule
+     * 
+     * @param  \Illuminate\Http\Request $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request, $id)
+    {
+        $appkey = $request->header('appkey');
+        $domain = $request->header('domain');
+        $resp = array();
+        
+        if (!empty($appkey) && !empty($domain)) {
+            if ((int)$id <= 0) {
+                $resp = Resp::error(400, 1020);            
+            } else {
+                $blockschedule = $this->blockSchedules->destroyBlockSchedule($appkey, $domain, $id);
+
+                if (isset($blockschedule['error']) && is_a($blockschedule['error'], 'Exception')) {                
+                    $resp = Resp::error(500, $blockschedule['error']->getCode(), '', $blockschedule['error']);
+                } else {
+                    $resp = Resp::make(200);
+                }
+            }
+        } else {
+            return Resp::error(400, 1000);
         }
         
         return $resp;
