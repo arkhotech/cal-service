@@ -104,6 +104,40 @@ class AppointmentController extends Controller
     }
     
     /**
+     * Controller que despliega listado de citas por solicitante
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function listAvailability(Request $request, $id)
+    {        
+        $appkey = $request->header('appkey');
+        $domain = $request->header('domain');        
+        $resp = array();
+        
+        if (!empty($appkey) && !empty($domain)) {
+            $appointments = $this->appointments->listAppointmentsAvailability($appkey, $domain, $id);
+            
+            if (isset($appointments['error']) && is_a($appointments['error'], 'Exception')) {
+                $resp = Resp::error(500, $appointments['error']->getCode(), '', $appointments['error']);
+            } else {
+                if (count($appointments['data']) > 0) {                    
+                    $appointment['appointments'] = $appointments['data'];
+                    $appointment['count'] = $appointments['count'];
+                    $resp = Resp::make(200, $appointment);
+                } else {
+                    $resp = Resp::error(404, 2070);
+                }
+            }
+        } else {
+            $resp = Resp::error(400, 1000);
+        }
+        
+        return $resp;
+    }
+    
+    /**
      * Crea un nuevo registro de tipo appointment
      *
      * @param  \Illuminate\Http\Request $request
