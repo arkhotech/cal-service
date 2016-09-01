@@ -1277,6 +1277,16 @@ definitions:
         type: integer
         format: int32
         description: ID del calendario que se insertó en DB
+  DateAppointment:
+    type: object
+    required:
+    - YYYY-MM-DD
+    properties:
+      YYYY-MM-DD:
+        type: array
+        description: ''
+        items:
+          "$ref": "#/definitions/AppointmentAvailable"
   DayOff:
     type: object
     required:
@@ -1567,12 +1577,21 @@ definitions:
   OutputAppointmentAvailable:
     type: object
     required:
+    - appointmentsavailable
+    - concurrency
+    - owner_name
     - response
     properties:
       appointmentsavailable:
         type: array
         items:
-          "$ref": "#/definitions/AppointmentAvailable"
+          "$ref": "#/definitions/DateAppointment"
+      concurrency:
+        type: string
+        description: Concurrencia de la agenda
+      owner_name:
+        type: string
+        description: Propietario de la agenda
       response:
         "$ref": "#/definitions/GenericResponse"
   OutputCalendar:
