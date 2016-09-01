@@ -201,7 +201,7 @@ class CalendarRepository
                     }
 
                     $res['data'] = $cal_array;
-                    $res['count'] = 1;
+                    $res['count'] = $calendars->count();
                     $res['error'] = null;                    
                     
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);

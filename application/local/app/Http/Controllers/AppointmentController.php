@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\AppointmentRepository;
+use App\Repositories\CalendarRepository;
 use App\Response as Resp;
 use Validator;
 
@@ -113,21 +114,32 @@ class AppointmentController extends Controller
     public function listAvailability(Request $request, $id)
     {        
         $appkey = $request->header('appkey');
-        $domain = $request->header('domain');        
+        $domain = $request->header('domain');
+        $date = $request->input('date', null);
         $resp = array();
         
         if (!empty($appkey) && !empty($domain)) {
-            $appointments = $this->appointments->listAppointmentsAvailability($appkey, $domain, $id);
+            $cal = new CalendarRepository();
+            $calendars = $cal->listCalendarById($appkey, $domain, $id);
             
-            if (isset($appointments['error']) && is_a($appointments['error'], 'Exception')) {
-                $resp = Resp::error(500, $appointments['error']->getCode(), '', $appointments['error']);
-            } else {
-                if (count($appointments['data']) > 0) {                    
-                    $appointment['appointments'] = $appointments['data'];
-                    $resp = Resp::make(200, $appointment);
+            if ($calendars['error'] === null && $calendars['count'] > 0) {                
+                $appointments = $this->appointments->listAppointmentsAvailability($appkey, $domain, $id, $date, $calendars['data']);
+
+                if (isset($appointments['error']) && is_a($appointments['error'], 'Exception')) {
+                    $resp = Resp::error(500, $appointments['error']->getCode(), '', $appointments['error']);
                 } else {
-                    $resp = Resp::error(404, 2070);
+                    if (count($appointments['data']) > 0) {                    
+                        $appointment['owner_name'] = $appointments['owner_name'];
+                        $appointment['concurrency'] = $appointments['concurrency'];
+                        $appointment['appointmentsavailable'] = $appointments['data'];
+                        
+                        $resp = Resp::make(200, $appointment);
+                    } else {
+                        $resp = Resp::error(404, 2070);
+                    }
                 }
+            } else {
+                $resp = Resp::error(404, 1010);
             }
         } else {
             $resp = Resp::error(400, 1000);

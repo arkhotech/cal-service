@@ -195,15 +195,20 @@ class AppointmentRepository
      * @param string $appkey
      * @param string $domain
      * @param int $calendar_id
+     * @param date $date
+     * @param int $calendar_array
      * @return Collection
      */
-    public function listAppointmentsAvailability($appkey, $domain, $calendar_id)
-    {
-        $res = array();
-        
+    public function listAppointmentsAvailability($appkey, $domain, $calendar_id, $date = null, $calendar_array = array())
+    {        
+        $res = array();        
         try {            
             $ttl = (int)config('calendar.cache_ttl');
-            $month_max_availability = (int)config('calendar.month_max_appointments');
+            $month_max_availability = (int)config('calendar.month_max_appointments');            
+            $owner_name = isset($calendar_array[0]['owner_name']) ? $calendar_array[0]['owner_name'] : '';
+            $schedule = isset($calendar_array[0]['schedule']) ? $calendar_array[0]['schedule'] : array();
+            $time_attention = isset($calendar_array[0]['time_attention']) ? $calendar_array[0]['time_attention'] : 0;
+            $concurrency = isset($calendar_array[0]['concurrency']) ? $calendar_array[0]['concurrency'] : 1;
             $cache_id = sha1('cacheAppointmentListAvailability_'.$calendar_id);
             $tag = sha1($appkey.'_'.$domain);
             $res = Cache::tags($tag)->get($cache_id);
@@ -215,29 +220,36 @@ class AppointmentRepository
                         'subject',
                         'applyer_name',
                         'applyer_email',
-                        'owner_name',
                         'appointment_start_time',
-                        'appointment_end_time',                        
-                        DB::raw('"" AS time'),
-                        DB::raw('"" AS available'),
+                        'appointment_end_time',
                         'schedule',
                         'time_attention'
                     );                    
                     
-                    $months = new \DateTime(date('Y-m-d H:i:s'));
-                    $interval = new \DateInterval('P'.$month_max_availability.'M');
-                    $max_date_time = $months->add($interval)->format('Y-m-d H:i:s');
-                    $schedule = array();
-                    $time_attention = 0;
-                    
                     //Citas
-                    $appointments = Appointment::select($columns)
-                            ->join('calendars', 'calendars.id', '=', 'appointments.calendar_id')
+                    if ($date === null) {
+                        $months = new \DateTime(date('Y-m-d H:i:s'));
+                        $interval = new \DateInterval('P'.$month_max_availability.'M');
+                        $max_date_time = $months->add($interval)->format('Y-m-d H:i:s');
+                    
+                        $appointments = Appointment::select($columns)
+                            ->join('calendars', 'appointments.calendar_id', '=', 'calendars.id')
                             ->where('calendar_id', $calendar_id)
                             ->where(DB::raw('DATE(appointment_start_time)'), '>=', date('Y-m-d'))
                             ->where('appointment_start_time', '<=', $max_date_time)
                             ->where('is_canceled', '<>', 1)                            
                             ->where('is_reserved', 0)->orderBy('appointment_start_time', 'ASC')->get();
+                    } else {                        
+                        $appointment_date = new \DateTime($date);
+                        $max_date_time = $appointment_date->format('Y-m-d');                        
+                        
+                        $appointments = Appointment::select($columns)
+                            ->join('calendars', 'appointments.calendar_id', '=', 'calendars.id')
+                            ->where('calendar_id', $calendar_id)
+                            ->where(DB::raw('DATE(appointment_start_time)'), $appointment_date->format('Y-m-d'))
+                            ->where('is_canceled', '<>', 1)                            
+                            ->where('is_reserved', 0)->get();
+                    }
                     
                     $appointment_array = array();
                     $i = 0;
@@ -247,10 +259,7 @@ class AppointmentRepository
                         $appointment_array[$i]['appointment_id'] = $appointment->appointment_id;
                         $appointment_array[$i]['subject'] = $appointment->subject;
                         $appointment_array[$i]['applyer_name'] = $appointment->applyer_name;
-                        $appointment_array[$i]['applyer_email'] = $appointment->applyer_email;
-                        $appointment_array[$i]['owner_name'] = $appointment->owner_name;
-                        $schedule = @unserialize($appointment->schedule);
-                        $time_attention = $appointment->time_attention;
+                        $appointment_array[$i]['applyer_email'] = $appointment->applyer_email;                        
                         $appointment_array[$i]['appointment_start_time'] = $date1->format('Y-m-d\TH:i:sO');
                         $appointment_array[$i]['appointment_end_time'] = $date2->format('Y-m-d\TH:i:sO');                        
                         $appointment_array[$i]['time'] = '';
@@ -263,9 +272,12 @@ class AppointmentRepository
                     $blockschedule_rs = $blockschedule->listBlockScheduleByCalendarId($appkey, $domain, $calendar_id);
                     $blockschedules = $blockschedule_rs['error'] === null ? $blockschedule_rs['data'] : array();
                     
-                    //Sample
-                    $max_date_time = '2016-09-08';
-                    $tmp_date = new \DateTime(date('Y-m-d'));
+                    if ($date === null) {
+                        $tmp_date = new \DateTime(date('Y-m-d'));
+                    } else {
+                        $tmp_date = new \DateTime($date);
+                    }
+                    
                     $max_date = new \DateTime($max_date_time);
                     $appointment_availability = array();
                     
@@ -276,8 +288,8 @@ class AppointmentRepository
                         $day_of_Week = CalendarRepository::dayOfWeeks($day_of_Week->format('l'));
                         $times = isset($schedule[$day_of_Week]) ? $schedule[$day_of_Week] : array();
                         $time_range = array();
-                        
                         $j = 0;
+                        
                         foreach ($times as $t) {
                             $_time = explode('-', $t);
                             if (is_array($_time) && count($_time) == 2) {                                
@@ -290,8 +302,7 @@ class AppointmentRepository
                                     
                                     if ($ind > -1) {
                                         $time_range[$j]['appointment_id'] = $appointment_array[$ind]['appointment_id'];
-                                        $time_range[$j]['subject'] = $appointment_array[$ind]['subject'];
-                                        $time_range[$j]['owner_name'] = $appointment_array[$ind]['owner_name'];
+                                        $time_range[$j]['subject'] = $appointment_array[$ind]['subject'];                                        
                                         $time_range[$j]['applyer_name'] = $appointment_array[$ind]['applyer_name'];
                                         $time_range[$j]['applyer_email'] = $appointment_array[$ind]['applyer_email'];
                                         $time_range[$j]['appointment_start_time'] = $appointment_array[$ind]['appointment_start_time'];
@@ -300,8 +311,7 @@ class AppointmentRepository
                                         $time_range[$j]['available'] = 'R';
                                     } else {
                                         $time_range[$j]['appointment_id'] = '';
-                                        $time_range[$j]['subject'] = '';
-                                        $time_range[$j]['owner_name'] = '';
+                                        $time_range[$j]['subject'] = '';                                        
                                         $time_range[$j]['applyer_name'] = '';
                                         $time_range[$j]['applyer_email'] = '';
                                         $time_range[$j]['appointment_start_time'] = '';
@@ -322,6 +332,8 @@ class AppointmentRepository
                     }
                     
                     $res['data'] = $appointment_availability;
+                    $res['owner_name'] = $owner_name;
+                    $res['concurrency'] = $concurrency;
                     $res['error'] = null;                    
                     
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);

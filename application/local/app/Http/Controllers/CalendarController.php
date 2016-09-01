@@ -206,6 +206,7 @@ class CalendarController extends Controller
                 'concurrency' => 'bail|required|integer',
                 'ignore_non_working_days' => 'required|boolean',
                 'time_cancel_appointment' => 'required|integer',
+                'time_confirm_appointment' => 'required|integer',                
                 'appkey' => 'bail|required|max:15',
                 'domain' => 'bail|required|max:150'
             ]);
@@ -266,7 +267,8 @@ class CalendarController extends Controller
                 'time_attention' => 'bail|required|integer',
                 'concurrency' => 'bail|required|integer',
                 'ignore_non_working_days' => 'required|boolean',
-                'time_cancel_appointment' => 'required|integer'
+                'time_cancel_appointment' => 'required|integer',
+                'time_confirm_appointment' => 'required|integer'
             ]);
 
             if ($validator->fails()) {
