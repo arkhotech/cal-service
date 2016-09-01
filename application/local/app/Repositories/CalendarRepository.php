@@ -263,6 +263,64 @@ class CalendarRepository
         
         return $res;
     }
+
+    /**
+     * Obtiene un calendario por Owner ID
+     *      
+     * @param string $appkey
+     * @param string $domain
+     * @param int $id     
+     * @return Collection
+     */
+    public function listByOwnerId($appkey, $domain, $id)
+    {
+        $res = array();
+        
+        try {            
+            $ttl = (int)config('calendar.cache_ttl');
+            $cache_id = sha1('cacheCalendarListByOwnerId_'.$id);
+            $tag = sha1($appkey.'_'.$domain);
+            $res = Cache::tags($tag)->get($cache_id);
+            
+            if ($res === null) {
+                if ((int)$id > 0) {
+                    $calendars = Calendar::where('owner_id', $id)->get();
+                    
+                    $cal_array = array();
+                    $i = 0;
+                    foreach ($calendars as $d) {
+                        $cal_array[$i]['id'] = $d->id;
+                        $cal_array[$i]['name'] = $d->name;
+                        $cal_array[$i]['owner_id'] = $d->owner_id;
+                        $cal_array[$i]['owner_name'] = $d->owner_name;
+                        $cal_array[$i]['owner_email'] = $d->owner_email;
+                        $cal_array[$i]['is_group'] = $d->is_group;
+                        $cal_array[$i]['schedule'] = @unserialize($d->schedule);
+                        $cal_array[$i]['time_attention'] = $d->time_attention;
+                        $cal_array[$i]['concurrency'] = $d->concurrency;
+                        $cal_array[$i]['ignore_non_working_days'] = $d->ignore_non_working_days;
+                        $cal_array[$i]['time_cancel_appointment'] = $d->time_cancel_appointment;
+                        $cal_array[$i]['time_confirm_appointment'] = $d->time_confirm_appointment;
+                        $cal_array[$i]['appkey'] = $d->appkey;
+                        $cal_array[$i]['domain'] = $d->domain;
+                        $i++;
+                    }
+
+                    $res['data'] = $cal_array;
+                    $res['count'] = 1;
+                    $res['error'] = null;                    
+                    
+                    Cache::tags([$tag])->put($cache_id, $res, $ttl);
+                }
+            }
+        } catch (QueryException $qe) {
+            $res['error'] = $qe;
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }        
+        
+        return $res;
+    }
     
     /**
      * Crea un nuevo registro de tipo calendario

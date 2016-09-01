@@ -16,6 +16,7 @@ Route::group(array('prefix' => 'v1'), function() {
     //Calendar
     Route::get('calendars', 'CalendarController@index');    
     Route::get('calendars/searchByName', 'CalendarController@searchByName');
+    Route::get('calendars/listByOwner/{owner_id}', 'CalendarController@listByOwner');
     Route::get('calendars/{id}', 'CalendarController@findById');
     Route::post('calendars', 'CalendarController@store');
     Route::put('calendars/{id}', 'CalendarController@update');
