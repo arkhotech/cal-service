@@ -40,14 +40,23 @@ class DayOffRepository
                 $columns = array(
                     'id',
                     'name',
-                    DB::raw('DATE_FORMAT(date_dayoff, "%Y-%m-%dT%TZ") as date_dayoff'),
+                    'date_dayoff',
                 );
                 $daysoff = DayOff::select($columns)
                         ->where('appkey', $appkey)
                         ->where('domain', $domain)
                         ->where(DB::raw('YEAR(date_dayoff)'), $ano)->get();
                 
-                $res['data'] = $daysoff;
+                $days_array = array();
+                foreach ($daysoff as $day) {
+                    $date = new \DateTime($day->date_dayoff);
+                    $dayoff_date = $date->format('Y-m-d\TH:i:sO');
+                    $days_array['id'] = $day->id;
+                    $days_array['name'] = $day->name;
+                    $days_array['date_dayoff'] = $dayoff_date;
+                }
+                
+                $res['data'] = $days_array;
                 $res['count'] = $daysoff->count();                
                 $res['error'] = null;                
                 

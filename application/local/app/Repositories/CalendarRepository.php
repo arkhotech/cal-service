@@ -1,11 +1,9 @@
 <?php
-
 /**
  * Repository Calendar
  * 
  * @author Geovanni Escalante <gescalante@arkho.tech>
  */
-
 namespace App\Repositories;
 
 use Log;
@@ -39,11 +37,9 @@ class CalendarRepository
             if ($res === null) {
                 if ($page !== 0) {                    
                     $per_page = (int)config('calendar.per_page');            
-
                     $calendars = Calendar::where('appkey', $appkey)
                             ->where('domain', $domain)
                             ->where('status', 1)
-                            ->orderBy('name', 'ASC')
                             ->paginate($per_page);
                     
                     $res['data'] = $calendars->items();
@@ -51,8 +47,7 @@ class CalendarRepository
                 } else {
                     $calendars = Calendar::where('appkey', $appkey)
                             ->where('domain', $domain)
-                            ->where('status', 1)
-                            ->orderBy('name', 'ASC')->get();
+                            ->where('status', 1)->get();
                     
                     $res['data'] = $calendars;
                     $res['count'] = $calendars->count();
@@ -78,7 +73,6 @@ class CalendarRepository
                     $cal_array[$i]['domain'] = $d->domain;
                     $i++;
                 }
-
                 $res['data'] = $cal_array;                
                 Cache::tags([$tag])->put($cache_id, $res, $ttl);
             }                
@@ -141,7 +135,6 @@ class CalendarRepository
                         $cal_array[$i]['domain'] = $d->domain;
                         $i++;
                     }
-
                     $res['data'] = $cal_array;                    
                     $res['count'] = $calendars->count();
                     $res['error'] = null;                    
@@ -199,7 +192,6 @@ class CalendarRepository
                         $cal_array[$i]['domain'] = $d->domain;
                         $i++;
                     }
-
                     $res['data'] = $cal_array;
                     $res['count'] = 1;
                     $res['error'] = null;                    
@@ -215,8 +207,7 @@ class CalendarRepository
         
         return $res;
     }
-    
-	/**
+    /**
      * Obtiene un calendario por Owner ID
      *      
      * @param string $appkey
@@ -257,7 +248,6 @@ class CalendarRepository
                         $cal_array[$i]['domain'] = $d->domain;
                         $i++;
                     }
-
                     $res['data'] = $cal_array;
                     $res['count'] = 1;
                     $res['error'] = null;                    
@@ -273,7 +263,7 @@ class CalendarRepository
         
         return $res;
     }
-
+    
     /**
      * Crea un nuevo registro de tipo calendario
      * 
@@ -332,7 +322,6 @@ class CalendarRepository
             
             if (!$this->hasAvailableAppointments($appkey, $domain, $id)) {
                 unset($data['status']);
-
                 $calendar = Calendar::where('id', $id)->update($data);
                 $res['error'] = $calendar === false ? new \Exception('', 500) : null;
                 
@@ -369,7 +358,6 @@ class CalendarRepository
         try {
             
             if (!$this->hasAvailableAppointments($appkey, $domain, $id)) {
-
                 $calendar = Calendar::where('id', $id)->update(array('status' => 0));
                 $res['error'] = $calendar === false ? new \Exception('', 500) : null;
                 
@@ -409,8 +397,7 @@ class CalendarRepository
                     $results = Calendar::find($id)
                             ->appointments()
                             ->where('is_canceled', '<>', 1)
-                            ->where('appointment_start_time', '>=', date('Y-m-d H:i:s'))
-                            ->orderBy('appointment_start_time', 'ASC')->get();
+                            ->where('appointment_start_time', '>=', date('Y-m-d H:i:s'))->get();
                     
                     $resp = $results->count() ? true : false;                    
                     
@@ -450,7 +437,6 @@ class CalendarRepository
                         ->where('domain', $domain)
                         ->where('ignore_non_working_days', 0)
                         ->where(DB::raw('DATE(appointment_start_time)'), $date)
-                        ->orderBy('appointment_start_time', 'ASC')
                         ->get();
                     
                     $resp = $results->count() ? true : false;                    
@@ -508,45 +494,37 @@ class CalendarRepository
     
     public function sanitizeString($string)
     {
-
         $string = trim($string);
-
         $string = str_replace(
             array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),
             array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),
             $string
         );
-
         $string = str_replace(
             array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'),
             array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'),
             $string
         );
-
         $string = str_replace(
             array('í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î'),
             array('i', 'i', 'i', 'i', 'I', 'I', 'I', 'I'),
             $string
         );
-
         $string = str_replace(
             array('ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô'),
             array('o', 'o', 'o', 'o', 'O', 'O', 'O', 'O'),
             $string
         );
-
         $string = str_replace(
             array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'),
             array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'),
             $string
         );
-
         $string = str_replace(
             array('ñ', 'Ñ', 'ç', 'Ç'),
             array('n', 'N', 'c', 'C',),
             $string
         );
-
         return $string;
     }
     
