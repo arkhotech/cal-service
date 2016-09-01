@@ -37,13 +37,30 @@ class BlockScheduleRepository
             if ($res === null) {
                 
                 if (!empty($appkey) && !empty($domain)) {
-                    $blockSchedule = BlockSchedule::where('calendar_id', $id)->get();
+                    $blockSchedules = BlockSchedule::where('calendar_id', $id)->get()   ;
                 } else {
-                    $blockSchedule = BlockSchedule::all();
+                    $blockSchedules = BlockSchedule::all();
                 }
                 
-                $res['data'] = $blockSchedule;
-                $res['count'] = $blockSchedule->count();                
+                $i = 0;
+                $blockSchedule_array = array();
+                foreach ($blockSchedules as $blockSchedule) {
+                    $date_ini = new \DateTime($blockSchedule->start_date);
+                    $date_end = new \DateTime($blockSchedule->end_date);
+                    $blockSchedule_array[$i]['id'] = $blockSchedule->id;
+                    $blockSchedule_array[$i]['calendar_id'] = $blockSchedule->calendar_id;
+                    $blockSchedule_array[$i]['user_id_block'] = $blockSchedule->user_id_block;
+                    $blockSchedule_array[$i]['user_name_block'] = $blockSchedule->user_name_block;
+                    $blockSchedule_array[$i]['start_date'] = $date_ini->format('Y-m-d\TH:i:sO');
+                    $blockSchedule_array[$i]['end_date'] = $date_end->format('Y-m-d\TH:i:sO');
+                    $blockSchedule_array[$i]['cause'] = $blockSchedule->cause;
+                    $blockSchedule_array[$i]['created_date'] = $blockSchedule->created_date;
+                    
+                    $i++;
+                }
+                
+                $res['data'] = $blockSchedule_array;
+                $res['count'] = $blockSchedules->count();                
                 $res['error'] = null;
 
                 Cache::tags([$tag])->put($cache_id, $res, $ttl);
@@ -161,8 +178,8 @@ class BlockScheduleRepository
                 
                 if ($res === null) {
                     $blocks = BlockSchedule::where('end_date', '>=', date('Y-m-d H:i:s'))
-                          ->where('start_date', '<=', $end_date)
-                          ->Where('end_date', '>=', $start_date)                          
+                          ->where('start_date', '<', $end_date)
+                          ->Where('end_date', '>', $start_date)                          
                           ->where('calendar_id', $calendar_id)->get();
                     
                     $res = $blocks->count() ? true : false;                    

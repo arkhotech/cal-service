@@ -124,7 +124,6 @@ class AppointmentController extends Controller
             } else {
                 if (count($appointments['data']) > 0) {                    
                     $appointment['appointments'] = $appointments['data'];
-                    $appointment['count'] = $appointments['count'];
                     $resp = Resp::make(200, $appointment);
                 } else {
                     $resp = Resp::error(404, 2070);
