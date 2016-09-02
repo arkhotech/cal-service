@@ -288,7 +288,6 @@ class AppointmentRepository
                         $day_of_Week = CalendarRepository::dayOfWeeks($day_of_Week->format('l'));
                         $times = isset($schedule[$day_of_Week]) ? $schedule[$day_of_Week] : array();
                         $time_range = array();
-                        $j = 0;
                         
                         foreach ($times as $t) {
                             $_time = explode('-', $t);
@@ -296,38 +295,41 @@ class AppointmentRepository
                                 $time_ini = new \DateTime($tmp_date->format('Y-m-d').' '.$_time[0].':00');
                                 $time_end = new \DateTime($tmp_date->format('Y-m-d').' '.$_time[1].':00');
                                 
-                                while ($time_ini->format('Y-m-d H:i:s') <= $time_end->format('Y-m-d H:i:s')) {                                    
-                                    $ind = $this->getIndex($appointment_array, $time_ini->format('Y-m-d H:i:s'), $time_end->format('Y-m-d H:i:s'));
-                                    $ind_block = $this->getIndex($blockschedules, $time_ini->format('Y-m-d H:i:s'), $time_end->format('Y-m-d H:i:s'), 'blockschedule');
+                                while ($time_ini->format('Y-m-d H:i:s') < $time_end->format('Y-m-d H:i:s')) {                                    
+                                    $time_range = array();
+                                    $timeEnd = new \DateTime($time_ini->format('Y-m-d H:i:s'));
+                                    $timeEnd->add(new \DateInterval('PT'.$time_attention.'M'));
                                     
-                                    if ($ind > -1) {
-                                        $time_range[$j]['appointment_id'] = $appointment_array[$ind]['appointment_id'];
-                                        $time_range[$j]['subject'] = $appointment_array[$ind]['subject'];                                        
-                                        $time_range[$j]['applyer_name'] = $appointment_array[$ind]['applyer_name'];
-                                        $time_range[$j]['applyer_email'] = $appointment_array[$ind]['applyer_email'];
-                                        $time_range[$j]['appointment_start_time'] = $appointment_array[$ind]['appointment_start_time'];
-                                        $time_range[$j]['appointment_end_time'] = $appointment_array[$ind]['appointment_end_time'];
-                                        $time_range[$j]['time'] = $time_ini->format('H:i');
-                                        $time_range[$j]['available'] = 'R';
-                                    } else {
-                                        $time_range[$j]['appointment_id'] = '';
-                                        $time_range[$j]['subject'] = '';                                        
-                                        $time_range[$j]['applyer_name'] = '';
-                                        $time_range[$j]['applyer_email'] = '';
-                                        $time_range[$j]['appointment_start_time'] = '';
-                                        $time_range[$j]['appointment_end_time'] = '';                                        
-                                        $time_range[$j]['time'] = $time_ini->format('H:i');
-                                        $time_range[$j]['available'] = $ind_block > -1 ? 'B' : 'D';
-                                    }                                    
+                                    $ind = $this->getIndex($appointment_array, $time_ini->format('Y-m-d H:i:s'), $timeEnd->format('Y-m-d H:i:s'));
+                                    $ind_block = $this->getIndex($blockschedules, $time_ini->format('Y-m-d H:i:s'), $timeEnd->format('Y-m-d H:i:s'), 'blockschedule');
+                                        
+                                    for ($k=0; $k<$concurrency; $k++) {
+                                        if ($ind > -1) {
+                                            $time_range[$k]['appointment_id'] = $appointment_array[$ind]['appointment_id'];
+                                            $time_range[$k]['subject'] = $appointment_array[$ind]['subject'];                                        
+                                            $time_range[$k]['applyer_name'] = $appointment_array[$ind]['applyer_name'];
+                                            $time_range[$k]['applyer_email'] = $appointment_array[$ind]['applyer_email'];
+                                            $time_range[$k]['appointment_start_time'] = $appointment_array[$ind]['appointment_start_time'];
+                                            $time_range[$k]['appointment_end_time'] = $appointment_array[$ind]['appointment_end_time'];                                            
+                                            $time_range[$k]['available'] = 'R';
+                                        } else {
+                                            $time_range[$k]['appointment_id'] = '';
+                                            $time_range[$k]['subject'] = '';                                        
+                                            $time_range[$k]['applyer_name'] = '';
+                                            $time_range[$k]['applyer_email'] = '';
+                                            $time_range[$k]['appointment_start_time'] = '';
+                                            $time_range[$k]['appointment_end_time'] = '';                                            
+                                            $time_range[$k]['available'] = $ind_block > -1 ? 'B' : 'D';
+                                        }
+                                    }
                                     
+                                    $appointment_availability[$tmp_date->format('Y-m-d')][$time_ini->format('H:i')] = $time_range;
                                     $time_ini->add(new \DateInterval('PT'.$time_attention.'M'));
-                                    $j++;
                                 }
                             }
                         }                        
                         
                         //Armo el array por dias que tendra el array de rango de horarios
-                        $appointment_availability[$tmp_date->format('Y-m-d')] = $time_range;
                         $tmp_date->add(new \DateInterval('P1D'));
                     }
                     
@@ -592,7 +594,7 @@ class AppointmentRepository
         }
         
         return $res;
-    }
+    }  
     
     /**
      * Define una cita a si asistio o no el usuario
@@ -612,6 +614,84 @@ class AppointmentRepository
             if ((int)$id > 0) {
                 $columns['applyer_attended'] = $data['applyer_attended'];
                 Appointment::where('id', $id)->update($columns);
+                $res['error'] = null;
+                
+                $tag = sha1($appkey.'_'.$domain);
+                Cache::tags($tag)->flush();
+            }
+        } catch (QueryException $qe) {
+                $res['error'] = $qe;
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }
+        
+        return $res;
+    }
+    
+    /**
+     * Elimina un registro de tipo Appointment
+     * 
+     * @param string $appkey
+     * @param string $domain
+     * @param int $id
+     * @return bool
+     */
+    public function destroyAppointment($appkey, $domain, $id)
+    {
+        $res = array();
+        
+        try {
+            $appointment = Appointment::destroy($id);
+            $res['error'] = $appointment === false ? new \Exception('', 500) : null;
+            
+            $tag = sha1($appkey.'_'.$domain);
+            Cache::tags($tag)->flush();
+        } catch (QueryException $qe) {            
+                $res['error'] = $qe;
+        } catch (Exception $e) {
+            $res['error'] = $e;
+        }
+        
+        return $res;
+    }
+    
+    /**
+     * Elimina citas cuya reserva haya pasado cierto tiempo
+     *
+     * @param string $appkey
+     * @param string $domain
+     * @return Collection
+     */
+    public function deleteAppointmentsPendingToConfirm($appkey, $domain)
+    {
+        $res = array();
+        
+        try {
+            
+            if (!empty($appkey) && !empty($domain)) {
+                $columns = array(
+                    'appointments.id',
+                    'reservation_date',
+                    'time_confirm_appointment'
+                );
+                $now = new \DateTime(date('Y-m-d H:i:s'));
+                
+                $appointments = Appointment::select($columns)
+                        ->join('calendars', 'appointments.calendar_id', '=', 'calendars.id')
+                        ->where('appointments.is_reserved', 1)
+                        ->where('appointments.is_canceled', 0)
+                        ->where('calendars.appkey', $appkey)
+                        ->where('calendars.domain', $domain)->get();
+                
+                foreach ($appointments as $appointment) {                     
+                    $time_to_confirm = (int)$appointment->time_confirm_appointment;                    
+                    $reservation_date = new \DateTime($appointment->reservation_date);
+                    $diff = $reservation_date->diff($now);
+                    if ($diff->format('%R%h') >= $time_to_confirm) {
+                        $this->destroyAppointment($appkey, $domain, (int)$appointment->id);
+                    }
+                }                
+                
                 $res['error'] = null;
                 
                 $tag = sha1($appkey.'_'.$domain);
@@ -812,7 +892,7 @@ class AppointmentRepository
             }
             
             $date1 = new \DateTime($element_ini);
-            $date2 = new \DateTime($element_end);            
+            $date2 = new \DateTime($element_end);
             
             if ($date_ini_db->format('Y-m-d H:i:s') < $date2->format('Y-m-d H:i:s') &&
                     $date_end_db->format('Y-m-d H:i:s') > $date1->format('Y-m-d H:i:s')) {
@@ -826,22 +906,11 @@ class AppointmentRepository
         return $index;
     }
     
-    public function sendMail($template, $data)
+    public function sendEmail($template, $data)
     {
-        $from = config('calendar.email_from');
-        $from_name = config('calendar.email_from_name');
-        $data_view = array();        
-        $data = array(
-            'from' => $from,
-            'from_name' => $from_name,
-            'to' => $data['to'],
-            'subject' => $data['subject']
-        );
-        
-        Mail::send($template, $data_view, function ($message) use ($data) {
-            $message->from($data['from'], $data['from_name']);
-            $message->to($data['to']);
-            $message->subject($data['subject']);
-        });        
+        /*Mail::send($template, $data, function ($m) use ($data) {
+            $m->from('hello@app.com', 'Your Application');
+            $m->to($data['to_email'], $data['to_name'])->subject($data['subject']);
+        });*/
     }
 }

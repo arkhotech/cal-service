@@ -273,33 +273,36 @@ class AppointmentController extends Controller
         $domain = $request->header('domain');
         $calendar_id = 0;
         $appointment_start_time = '';
+        $id = (int)$id;
         
         $appointment = $this->appointments->listAppointmentById($appkey, $domain, $id);        
-        if (isset($appointment['data'])) {
+        if (isset($appointment['data']) && (int)$appointment['count'] > 0) {
             foreach ($appointment['data'] as $a) {            
                 $calendar_id = (int)$a->calendar_id;
                 $appointment_start_time = $a->appointment_start_time;
             }
-        }
-        
-        if (!empty($appkey) && !empty($domain)) {
-            if ((int)$id > 0 && $calendar_id > 0 && $appointment_start_time) {
-                $validate = $this->appointments->isValidAppointment($appkey, $domain, $calendar_id, $appointment_start_time, $id);
-                
-                if (!$validate['is_ok']) {                    
-                    return Resp::error(406, $validate['error_code']);
-                } else {                    
-                    $appointment = $this->appointments->confirmAppointment($appkey, $domain, $id, $data);
-                }
+            
+            if (!empty($appkey) && !empty($domain)) {                
+                if ( $calendar_id > 0 && $appointment_start_time) {
+                    $validate = $this->appointments->isValidAppointment($appkey, $domain, $calendar_id, $appointment_start_time, $id);
 
-                if (isset($appointment['error']) && is_a($appointment['error'], 'Exception')) {                
-                    $resp = Resp::error(500, $appointment['error']->getCode(), '', $appointment['error']);
-                } else {                    
-                    $resp = Resp::make(200);
+                    if (!$validate['is_ok']) {                    
+                        return Resp::error(406, $validate['error_code']);
+                    } else {                    
+                        $appointment = $this->appointments->confirmAppointment($appkey, $domain, $id, $data);
+                    }
+
+                    if (isset($appointment['error']) && is_a($appointment['error'], 'Exception')) {                
+                        $resp = Resp::error(500, $appointment['error']->getCode(), '', $appointment['error']);
+                    } else {                    
+                        $resp = Resp::make(200);
+                    }
                 }
+            } else {
+                return Resp::error(400, 1000);
             }
         } else {
-            return Resp::error(400, 1000);
+            return Resp::error(404, 2070);
         }
         
         return $resp;
@@ -361,6 +364,33 @@ class AppointmentController extends Controller
                         $resp = Resp::error(406, 2060, 'Can not cancel appointment because time to cancel calendar must be greather or equal to '.$time_to_cancel.' hours');
                     }
                 }
+            }
+        } else {
+            return Resp::error(400, 1000);
+        }
+        
+        return $resp;
+    }
+    
+    /**
+     * Elimina un registro de tipo dayoff
+     * 
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function destroyAppointmentsPendingToConfirm(Request $request)
+    {
+        $appkey = $request->header('appkey');
+        $domain = $request->header('domain');
+        $resp = array();
+        
+        if (!empty($appkey) && !empty($domain)) {            
+            $appointments = $this->appointments->deleteAppointmentsPendingToConfirm($appkey, $domain);
+
+            if (isset($appointments['error']) && is_a($appointments['error'], 'Exception')) {                
+                $resp = Resp::error(500, $appointments['error']->getCode(), '', $appointments['error']);
+            } else {
+                $resp = Resp::make(200);
             }
         } else {
             return Resp::error(400, 1000);
