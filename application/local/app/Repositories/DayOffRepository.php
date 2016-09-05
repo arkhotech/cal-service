@@ -47,6 +47,7 @@ class DayOffRepository
                         ->where('domain', $domain)
                         ->where(DB::raw('YEAR(date_dayoff)'), $ano)->get();
                 
+                $daysoff_array = array();
                 $days_array = array();
                 foreach ($daysoff as $day) {
                     $date = new \DateTime($day->date_dayoff);
@@ -54,9 +55,11 @@ class DayOffRepository
                     $days_array['id'] = $day->id;
                     $days_array['name'] = $day->name;
                     $days_array['date_dayoff'] = $dayoff_date;
+
+                    array_push($daysoff_array, $days_array);
                 }
                 
-                $res['data'] = $days_array;
+                $res['data'] = $daysoff_array;
                 $res['count'] = $daysoff->count();                
                 $res['error'] = null;                
                 
