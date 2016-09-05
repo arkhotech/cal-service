@@ -131,7 +131,6 @@ class AppointmentController extends Controller
                     if (count($appointments['data']) > 0) {
                         $appointment['owner_name'] = $appointments['owner_name'];
                         $appointment['concurrency'] = $appointments['concurrency'];
-                        $appointment['num_appoint'] = $appointments['num_appoint'];
                         $appointment['appointmentsavailable'] = $appointments['data'];
                         
                         $resp = Resp::make(200, $appointment);

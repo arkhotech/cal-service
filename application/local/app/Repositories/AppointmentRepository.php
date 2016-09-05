@@ -336,7 +336,6 @@ class AppointmentRepository
                     $res['data'] = $appointment_availability;
                     $res['owner_name'] = $owner_name;
                     $res['concurrency'] = $concurrency;
-                    $res['num_appoint'] = count($appointment_array);
                     $res['error'] = null;
                     
                     Cache::tags([$tag])->put($cache_id, $res, $ttl);
